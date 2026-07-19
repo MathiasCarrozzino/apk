@@ -906,6 +906,10 @@ async function exportarExcel() {
 
 
 
+    let buffer, archivo;
+
+    try {
+
     const datos =
         lista.map(
             item => ({
@@ -1079,12 +1083,12 @@ XLSX.utils.book_append_sheet(
 
 
 
-    const archivo =
+    archivo =
         `inventario_${fecha}.xlsx`;
 
 
 
-    const buffer =
+    buffer =
         XLSX.write(
             libro,
             {
@@ -1092,6 +1096,19 @@ XLSX.utils.book_append_sheet(
                 type:"array"
             }
         );
+
+    } catch (error) {
+
+        console.error(error);
+
+        mostrarMensaje(
+            "No se pudo generar el Excel (revisá la cantidad de artículos)",
+            "error"
+        );
+
+        return;
+
+    }
 
 
     // ==========================================
@@ -1259,16 +1276,28 @@ document.body.removeChild(enlace);
 
 function arrayBufferABase64(buffer) {
 
-    let binario = "";
+    // Se procesa en bloques (chunks) en vez de byte a byte:
+    // concatenar carácter por carácter con += es O(n²) y para
+    // inventarios medianos/grandes puede colgar el WebView y
+    // hacer que Android mate el proceso (la app "se cierra sola").
 
     const bytes = new Uint8Array(buffer);
 
-    for (let i = 0; i < bytes.byteLength; i++) {
+    const TAMANO_BLOQUE = 0x8000; // 32768
 
-        binario += String.fromCharCode(bytes[i]);
+    const partes = [];
+
+    for (let i = 0; i < bytes.byteLength; i += TAMANO_BLOQUE) {
+
+        const bloque =
+            bytes.subarray(i, i + TAMANO_BLOQUE);
+
+        partes.push(
+            String.fromCharCode.apply(null, bloque)
+        );
 
     }
 
-    return btoa(binario);
+    return btoa(partes.join(""));
 
 }
