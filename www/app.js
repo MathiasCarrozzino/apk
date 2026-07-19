@@ -5,34 +5,54 @@ Archivo principal
 ==========================================
 */
 
-document.addEventListener("DOMContentLoaded", iniciarAplicacion);
+document.addEventListener(
+    "DOMContentLoaded",
+    iniciarAplicacion
+);
+
 
 function iniciarAplicacion() {
 
-    console.log("Scanner Inventario iniciado");
+    console.log(
+        "Scanner Inventario iniciado"
+    );
+
 
     // Inicializar configuración
+
     if (typeof iniciarTema === "function")
         iniciarTema();
+
 
     if (typeof cargarConfiguracion === "function")
         cargarConfiguracion();
 
+
+
     // Cargar datos guardados
+
     if (typeof cargarMaestroLocal === "function")
         cargarMaestroLocal();
+
 
     if (typeof cargarInventarioLocal === "function")
         cargarInventarioLocal();
 
+
+
     // Eventos
+
     registrarEventos();
 
-    // Dibujar interfaz
+
+
+    // Actualizar interfaz
+
     if (typeof actualizarVista === "function")
         actualizarVista();
 
-    // Mensaje de bienvenida
+
+
     mostrarMensaje(
         "Aplicación lista",
         "exito"
@@ -40,64 +60,143 @@ function iniciarAplicacion() {
 
 }
 
+
+
+// ==========================================
+// REGISTRO DE EVENTOS
+// ==========================================
+
 function registrarEventos() {
 
-    // ==========================
-    // Botones
-    // ==========================
 
-    document
-        .getElementById("btnAgregar")
-        .addEventListener("click", agregarArticulo);
+    function agregarEvento(
+        id,
+        evento,
+        funcion
+    ) {
 
-    document
-        .getElementById("btnNueva")
-        .addEventListener("click", nuevaSesion);
+        const elemento =
+            document.getElementById(id);
 
-    document
-        .getElementById("btnExportar")
-        .addEventListener("click", exportarExcel);
 
-    document
-        .getElementById("btnTema")
-        .addEventListener("click", cambiarTema);
+        if (elemento) {
 
-    document
-        .getElementById("archivoMaestro")
-        .addEventListener("change", cargarMaestroExcel);
+            elemento.addEventListener(
+                evento,
+                funcion
+            );
 
-    document
-        .getElementById("buscar")
-        .addEventListener("input", buscarArticulos);
+        } else {
 
-    // ==========================
+            console.warn(
+                "Elemento no encontrado:",
+                id
+            );
+
+        }
+
+    }
+
+
+
+    // BOTONES
+
+    agregarEvento(
+        "btnAgregar",
+        "click",
+        agregarArticulo
+    );
+
+
+    agregarEvento(
+        "btnNueva",
+        "click",
+        nuevaSesion
+    );
+
+
+    agregarEvento(
+        "btnExportar",
+        "click",
+        exportarExcel
+    );
+
+
+    agregarEvento(
+        "btnTema",
+        "click",
+        cambiarTema
+    );
+
+
+    agregarEvento(
+        "archivoMaestro",
+        "change",
+        cargarMaestroExcel
+    );
+
+
+    agregarEvento(
+        "buscar",
+        "input",
+        buscarArticulos
+    );
+
+
+
     // ENTER
-    // ==========================
 
-    document
-        .getElementById("codigo")
-        .addEventListener("keypress", eventoCodigo);
+    agregarEvento(
+        "codigo",
+        "keypress",
+        eventoCodigo
+    );
 
-    document
-        .getElementById("cantidad")
-        .addEventListener("keypress", eventoCantidad);
 
-    // ==========================
-    // Guardado automático
-    // ==========================
+    agregarEvento(
+        "cantidad",
+        "keypress",
+        eventoCantidad
+    );
+
+
+
+    // GUARDADO AUTOMÁTICO
 
     setInterval(() => {
 
-        if (typeof guardarInventario === "function")
+
+        if (
+            typeof guardarInventario === "function"
+        ) {
+
             guardarInventario();
 
-    }, 10000);
+        }
+
+
+    },10000);
+
 
 }
 
-window.addEventListener("beforeunload", () => {
 
-    if (typeof guardarInventario === "function")
-        guardarInventario();
 
-});
+// ==========================================
+// GUARDAR AL CERRAR
+// ==========================================
+
+window.addEventListener(
+    "beforeunload",
+    () => {
+
+        if (
+            typeof guardarInventario === "function"
+        ) {
+
+            guardarInventario();
+
+        }
+
+    }
+);

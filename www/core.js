@@ -1,25 +1,28 @@
 /*
 ==========================================
 Scanner Inventario v2.0
+
 core.js
 
-Contiene la lógica que faltaba:
-- Variables globales lista / maestro
-- Tema claro/oscuro
-- Carga del maestro (Excel/CSV)
-- Alta de artículos
-- Buscador
-- Nueva sesión
-- Exportar a Excel
-- Lector de cámara (html5-qrcode)
+Lógica principal:
+- Variables globales
+- Tema
+- Maestro Excel
+- Búsqueda
+- Inventario
 ==========================================
 */
 
+
 let lista = [];
+
 let maestro = [];
 
 let camaraActiva = false;
+
 let html5QrCode = null;
+
+
 
 // ==========================================
 // TEMA
@@ -27,144 +30,446 @@ let html5QrCode = null;
 
 function iniciarTema() {
 
-    const config = cargarConfiguracion();
+
+    const config =
+        cargarConfiguracion();
+
 
     if (config.tema === "oscuro") {
-        document.body.classList.add("dark");
-        document.getElementById("btnTema").textContent = "☀️";
+
+
+        document.body.classList.add(
+            "dark"
+        );
+
+
+        const boton =
+            document.getElementById(
+                "btnTema"
+            );
+
+
+        if (boton) {
+
+            boton.textContent = "☀️";
+
+        }
+
     }
+
 }
+
+
 
 function cambiarTema() {
 
-    document.body.classList.toggle("dark");
 
-    const oscuro = document.body.classList.contains("dark");
+    document.body.classList.toggle(
+        "dark"
+    );
 
-    document.getElementById("btnTema").textContent =
-        oscuro ? "☀️" : "🌙";
 
-    const config = cargarConfiguracion();
-    config.tema = oscuro ? "oscuro" : "claro";
-    guardarConfiguracion(config);
+    const oscuro =
+        document.body.classList.contains(
+            "dark"
+        );
+
+
+    const boton =
+        document.getElementById(
+            "btnTema"
+        );
+
+
+    if (boton) {
+
+        boton.textContent =
+            oscuro ? "☀️" : "🌙";
+
+    }
+
+
+    const config =
+        cargarConfiguracion();
+
+
+    config.tema =
+        oscuro ? "oscuro" : "claro";
+
+
+    guardarConfiguracion(
+        config
+    );
+
 }
 
+
+
 // ==========================================
-// MAESTRO
+// MAESTRO EXCEL
 // ==========================================
 
 function cargarMaestroExcel(evento) {
 
-    const archivo = evento.target.files[0];
+
+    const archivo =
+        evento.target.files[0];
+
 
     if (!archivo)
         return;
 
-    const estadoEl = document.getElementById("estado");
-    estadoEl.textContent = "Leyendo archivo...";
+
+
+    const estado =
+        document.getElementById(
+            "estado"
+        );
+
+
+    estado.textContent =
+        "Leyendo archivo...";
+
+
 
     if (typeof XLSX === "undefined") {
-        estadoEl.textContent = "Error: la librería de Excel no cargó (revisá tu conexión a internet)";
-        mostrarMensaje("La librería de Excel no está disponible", "error");
-        console.error("XLSX no está definido. Revisá que el <script> de cdn.jsdelivr.net/npm/xlsx esté en index.html y que haya internet.");
+
+
+        estado.textContent =
+            "Error cargando Excel";
+
+
+        mostrarMensaje(
+            "La librería Excel no está disponible",
+            "error"
+        );
+
+
         return;
+
     }
 
-    const lector = new FileReader();
 
-    lector.onload = function (e) {
+
+    const lector =
+        new FileReader();
+
+
+
+    lector.onload = function(e) {
+
 
         try {
 
-            const datos = new Uint8Array(e.target.result);
-            const libro = XLSX.read(datos, { type: "array" });
-            const hoja = libro.Sheets[libro.SheetNames[0]];
 
-            // Intento 1: por nombre de columna (EAN, Interno, Descripción...)
-            const filas = XLSX.utils.sheet_to_json(hoja, { defval: "" });
+            const datos =
+                new Uint8Array(
+                    e.target.result
+                );
 
-            maestro = filas
+
+            const libro =
+                XLSX.read(
+                    datos,
+                    {
+                        type:"array"
+                    }
+                );
+
+
+            const hoja =
+                libro.Sheets[
+                    libro.SheetNames[0]
+                ];
+
+
+
+            const filas =
+                XLSX.utils.sheet_to_json(
+                    hoja,
+                    {
+                        defval:""
+                    }
+                );
+
+
+
+            maestro =
+                filas
                 .map(normalizarFilaMaestro)
-                .filter(item => item.ean || item.interno);
+                .filter(
+                    item =>
+                    item.ean ||
+                    item.interno
+                );
 
-            // Intento 2 (fallback): si no reconoció encabezados, usar las
-            // primeras 3 columnas por posición (EAN | Interno | Descripción)
+
+
             if (maestro.length === 0) {
 
-                const filasCrudas = XLSX.utils.sheet_to_json(hoja, { header: 1, defval: "" });
 
-                maestro = filasCrudas
-                    .filter(fila => fila.some(celda => celda !== ""))
-                    .map(fila => ({
-                        ean: String(fila[0] ?? "").trim(),
-                        interno: String(fila[1] ?? "").trim(),
-                        descripcion: String(fila[2] ?? "").trim()
-                    }))
-                    .filter(item => item.ean || item.interno)
-                    .filter(item => item.ean.toLowerCase() !== "ean");
+                const filasCrudas =
+                    XLSX.utils.sheet_to_json(
+                        hoja,
+                        {
+                            header:1,
+                            defval:""
+                        }
+                    );
+
+
+                maestro =
+                    filasCrudas
+                    .filter(
+                        fila =>
+                        fila.some(
+                            celda =>
+                            celda !== ""
+                        )
+                    )
+                    .map(
+                        fila => ({
+
+                            ean:
+                            limpiarCodigo(
+                                fila[0]
+                            ),
+
+                            interno:
+                            limpiarCodigo(
+                                fila[1]
+                            ),
+
+                            descripcion:
+                            String(
+                                fila[2] ?? ""
+                            ).trim()
+
+                        })
+                    )
+                    .filter(
+                        item =>
+                        item.ean ||
+                        item.interno
+                    );
+
             }
 
+
+
             if (maestro.length === 0) {
-                estadoEl.textContent = "No se encontraron artículos en el archivo";
-                mostrarMensaje("El archivo no tiene datos reconocibles", "error");
-                console.warn("Encabezados detectados en la hoja:", filas[0] ? Object.keys(filas[0]) : "(sin filas)");
+
+
+                estado.textContent =
+                    "Sin artículos";
+
+
+                mostrarMensaje(
+                    "No se encontraron datos",
+                    "error"
+                );
+
+
                 return;
+
             }
+
+
 
             guardarMaestro();
 
-            estadoEl.textContent = `Maestro cargado (${maestro.length} artículos)`;
 
-            mostrarMensaje("Maestro cargado correctamente", "exito");
 
-        } catch (error) {
+            estado.textContent =
+                `Maestro cargado (${maestro.length} artículos)`;
 
-            console.error("Error al leer el maestro:", error);
-            estadoEl.textContent = "Error al leer el archivo maestro (ver consola)";
-            mostrarMensaje("Error al leer el archivo maestro", "error");
+
+            mostrarMensaje(
+                "Maestro cargado correctamente",
+                "exito"
+            );
+
+
+
+            console.log(
+                "Ejemplo maestro:",
+                maestro[0]
+            );
+
+
+
+        } catch(error) {
+
+
+            console.error(
+                error
+            );
+
+
+            mostrarMensaje(
+                "Error leyendo maestro",
+                "error"
+            );
+
         }
+
+
     };
 
-    lector.onerror = function () {
-        estadoEl.textContent = "No se pudo leer el archivo";
-        mostrarMensaje("No se pudo leer el archivo", "error");
-    };
 
-    lector.readAsArrayBuffer(archivo);
 
-    // Permite volver a elegir el mismo archivo si hace falta recargarlo
+    lector.readAsArrayBuffer(
+        archivo
+    );
+
+
     evento.target.value = "";
+
 }
+
+
+
+
+// ==========================================
+// NORMALIZAR FILA
+// ==========================================
 
 function normalizarFilaMaestro(fila) {
 
-    const claves = Object.keys(fila).reduce((acc, k) => {
-        acc[k.toString().trim().toLowerCase()] = fila[k];
-        return acc;
-    }, {});
 
-    const buscarValor = (...nombres) => {
-        for (const nombre of nombres) {
-            if (claves[nombre] !== undefined && claves[nombre] !== "") {
+    const claves =
+        Object.keys(fila)
+        .reduce(
+            (acc,k)=>{
+
+                acc[
+                    k
+                    .toString()
+                    .trim()
+                    .toLowerCase()
+                ] =
+                fila[k];
+
+                return acc;
+
+            },
+            {}
+        );
+
+
+
+    function obtener(...nombres) {
+
+
+        for(
+            const nombre of nombres
+        ){
+
+            if(
+                claves[nombre] !== undefined &&
+                claves[nombre] !== ""
+            ){
+
                 return claves[nombre];
+
             }
+
         }
+
+
         return "";
-    };
+
+    }
+
+
 
     return {
-        ean: String(buscarValor("ean", "codigo", "código", "cod. barras", "codigo de barras") || "").trim(),
-        interno: String(buscarValor("interno", "codigo interno", "código interno", "cod. interno") || "").trim(),
-        descripcion: String(buscarValor("descripcion", "descripción", "producto", "detalle") || "").trim()
+
+        ean:
+        limpiarCodigo(
+            obtener(
+                "ean",
+                "codigo",
+                "código",
+                "cod barras",
+                "codigo de barras"
+            )
+        ),
+
+
+        interno:
+        limpiarCodigo(
+            obtener(
+                "interno",
+                "codigo interno",
+                "código interno"
+            )
+        ),
+
+
+        descripcion:
+        String(
+            obtener(
+                "descripcion",
+                "descripción",
+                "producto",
+                "detalle"
+            )
+        ).trim()
+
     };
+
 }
+
+// ==========================================
+// LIMPIAR CÓDIGO
+// ==========================================
+
+function limpiarCodigo(valor) {
+
+    return String(valor ?? "")
+        .trim()
+        .replace(".0", "");
+
+}
+
+
+
+// ==========================================
+// BUSCAR EN MAESTRO
+// ==========================================
 
 function buscarEnMaestro(codigo) {
 
-    return maestro.find(item =>
-        item.ean === codigo || item.interno === codigo
-    );
+
+    const buscado =
+        limpiarCodigo(codigo);
+
+
+
+    return maestro.find(item => {
+
+
+        const ean =
+            limpiarCodigo(item.ean);
+
+
+        const interno =
+            limpiarCodigo(item.interno);
+
+
+
+        return (
+            ean === buscado ||
+            interno === buscado
+        );
+
+
+    });
+
 }
+
+
 
 // ==========================================
 // AGREGAR ARTÍCULO
@@ -172,85 +477,286 @@ function buscarEnMaestro(codigo) {
 
 function agregarArticulo() {
 
-    const inputCodigo = document.getElementById("codigo");
-    const inputCantidad = document.getElementById("cantidad");
-    const inputObs = document.getElementById("observacion");
 
-    const codigo = inputCodigo.value.trim();
-    const cantidad = Number(inputCantidad.value) || 1;
-    const observacion = inputObs.value.trim();
+    const inputCodigo =
+        document.getElementById(
+            "codigo"
+        );
+
+
+    const inputCantidad =
+        document.getElementById(
+            "cantidad"
+        );
+
+
+    const inputObs =
+        document.getElementById(
+            "observacion"
+        );
+
+
+
+    const codigo =
+        inputCodigo.value.trim();
+
+
+
+    const cantidad =
+        Number(
+            inputCantidad.value
+        );
+
+
+
+    const observacion =
+        inputObs.value.trim();
+
+
 
     if (!codigo) {
-        mostrarMensaje("Ingresá un código", "error");
+
+
+        mostrarMensaje(
+            "Ingresá un código",
+            "error"
+        );
+
+
         inputCodigo.focus();
+
         return;
+
     }
 
-    const productoMaestro = buscarEnMaestro(codigo);
+
+
+    if (!cantidad || cantidad < 1) {
+
+
+        mostrarMensaje(
+            "Ingresá una cantidad válida",
+            "error"
+        );
+
+
+        inputCantidad.focus();
+
+        return;
+
+    }
+
+
+
+    const productoMaestro =
+        buscarEnMaestro(
+            codigo
+        );
+
+
 
     const articulo = {
-        ean: productoMaestro ? (productoMaestro.ean || codigo) : codigo,
-        interno: productoMaestro ? productoMaestro.interno : "",
-        descripcion: productoMaestro
-            ? productoMaestro.descripcion
-            : "Sin descripción (no está en el maestro)",
+
+
+        ean:
+        productoMaestro
+        ?
+        productoMaestro.ean || codigo
+        :
+        codigo,
+
+
+        interno:
+        productoMaestro
+        ?
+        productoMaestro.interno
+        :
+        "",
+
+
+
+        descripcion:
+        productoMaestro
+        ?
+        productoMaestro.descripcion
+        :
+        "Sin descripción (no está en el maestro)",
+
+
+
         cantidad,
+
+
         observacion
+
     };
 
-    const unificar = document.getElementById("unificar").checked;
+
+
+    const unificar =
+        document.getElementById(
+            "unificar"
+        ).checked;
+
+
 
     if (unificar) {
 
-        const existente = lista.find(item =>
-            item.ean === articulo.ean && item.interno === articulo.interno
-        );
+
+        const existente =
+            lista.find(
+                item =>
+                item.ean === articulo.ean &&
+                item.interno === articulo.interno
+            );
+
+
 
         if (existente) {
+
+
             existente.cantidad += cantidad;
-            if (observacion) existente.observacion = observacion;
+
+
+
+            if (observacion) {
+
+                existente.observacion =
+                    observacion;
+
+            }
+
+
         } else {
-            lista.push(articulo);
+
+
+            lista.push(
+                articulo
+            );
+
         }
 
+
+
     } else {
-        lista.push(articulo);
+
+
+        lista.push(
+            articulo
+        );
+
     }
 
+
+
     guardarInventario();
+
+
     actualizarVista();
 
+
+
     mostrarMensaje(
-        productoMaestro ? "Artículo agregado" : "Agregado (no está en el maestro)",
-        productoMaestro ? "exito" : "error"
+
+        productoMaestro
+        ?
+        "Artículo agregado"
+        :
+        "Agregado (no está en el maestro)",
+
+
+        productoMaestro
+        ?
+        "exito"
+        :
+        "error"
+
     );
 
+
+
     inputCodigo.value = "";
-    inputCantidad.value = 1;
+
+    inputCantidad.value = "";
+
     inputObs.value = "";
+
+
     inputCodigo.focus();
+
 }
 
+
+
 // ==========================================
-// ENTER en los campos
+// ENTER EN CAMPOS
 // ==========================================
 
 function eventoCodigo(e) {
 
+
     if (e.key === "Enter") {
+
+
         e.preventDefault();
-        document.getElementById("cantidad").focus();
-        document.getElementById("cantidad").select();
+
+
+
+        const cantidad =
+            document.getElementById(
+                "cantidad"
+            );
+
+
+
+        cantidad.focus();
+
+
+        cantidad.select();
+
+
     }
+
 }
+
+
+
 
 function eventoCantidad(e) {
 
+
     if (e.key === "Enter") {
+
+
         e.preventDefault();
+
+
+
         agregarArticulo();
+
+
+
+        setTimeout(
+            () => {
+
+
+                document
+                .getElementById(
+                    "codigo"
+                )
+                .focus();
+
+
+            },
+            100
+        );
+
+
     }
+
 }
+
+
 
 // ==========================================
 // BUSCADOR
@@ -258,22 +764,67 @@ function eventoCantidad(e) {
 
 function buscarArticulos() {
 
-    const texto = document.getElementById("buscar").value.trim().toLowerCase();
+
+    const texto =
+        document
+        .getElementById(
+            "buscar"
+        )
+        .value
+        .trim()
+        .toLowerCase();
+
+
 
     if (!texto) {
+
+
         actualizarVista();
+
         return;
+
     }
 
-    const filtrada = lista.filter(item =>
-        (item.ean || "").toLowerCase().includes(texto) ||
-        (item.interno || "").toLowerCase().includes(texto) ||
-        (item.descripcion || "").toLowerCase().includes(texto)
+
+
+    const filtrada =
+        lista.filter(
+            item =>
+
+            (item.ean || "")
+            .toLowerCase()
+            .includes(texto)
+
+
+            ||
+
+            (item.interno || "")
+            .toLowerCase()
+            .includes(texto)
+
+
+            ||
+
+            (item.descripcion || "")
+            .toLowerCase()
+            .includes(texto)
+
+        );
+
+
+
+    dibujarTabla(
+        filtrada
     );
 
-    dibujarTabla(filtrada);
-    dibujarTarjetas(filtrada);
+
+    dibujarTarjetas(
+        filtrada
+    );
+
 }
+
+
 
 // ==========================================
 // NUEVA SESIÓN
@@ -281,23 +832,58 @@ function buscarArticulos() {
 
 function nuevaSesion() {
 
+
     if (lista.length === 0) {
-        mostrarMensaje("El inventario ya está vacío", "error");
+
+
+        mostrarMensaje(
+            "El inventario ya está vacío",
+            "error"
+        );
+
+
         return;
+
     }
 
-    if (!confirm("¿Iniciar una nueva sesión? El inventario actual queda guardado en el historial.")) {
+
+
+    if(
+        !confirm(
+            "¿Iniciar una nueva sesión?"
+        )
+    ) {
+
         return;
+
     }
+
+
 
     guardarHistorial();
+
+
     limpiarInventario();
+
+
     actualizarVista();
 
-    document.getElementById("buscar").value = "";
 
-    mostrarMensaje("Nueva sesión iniciada", "exito");
+
+    document.getElementById(
+        "buscar"
+    ).value = "";
+
+
+
+    mostrarMensaje(
+        "Nueva sesión iniciada",
+        "exito"
+    );
+
 }
+
+
 
 // ==========================================
 // EXPORTAR EXCEL
@@ -305,42 +891,270 @@ function nuevaSesion() {
 
 function exportarExcel() {
 
+
     if (lista.length === 0) {
-        mostrarMensaje("No hay artículos para exportar", "error");
+
+
+        mostrarMensaje(
+            "No hay artículos para exportar",
+            "error"
+        );
+
+
         return;
+
     }
 
-    const datos = lista.map(item => ({
-        EAN: item.ean,
-        Interno: item.interno,
-        Descripción: item.descripcion,
-        Cantidad: item.cantidad,
-        Observación: item.observacion || ""
-    }));
 
-    const hoja = XLSX.utils.json_to_sheet(datos);
-    const libro = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(libro, hoja, "Inventario");
 
-    const fecha = new Date().toISOString().slice(0, 10);
-    const archivo = `inventario_${fecha}.xlsx`;
+    const datos =
+        lista.map(
+            item => ({
 
-const buffer = XLSX.write(libro, {
-    bookType: "xlsx",
-    type: "array"
+
+                EAN:item.ean,
+
+                Interno:item.interno,
+
+                Descripción:item.descripcion,
+
+                Cantidad:item.cantidad,
+
+                Observación:item.observacion || ""
+
+
+            })
+        );
+
+
+
+    const hoja = XLSX.utils.json_to_sheet(datos, {
+    origin: "A4"
 });
 
-const blob = new Blob(
-    [buffer],
-    { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }
+const libro = XLSX.utils.book_new();
+
+
+// ===============================
+// CABECERA
+// ===============================
+
+XLSX.utils.sheet_add_aoa(
+    hoja,
+    [
+        ["CONTROL DE INGRESOS"],
+        [""],
+        [
+            "",
+            "",
+            "",
+            "",
+            "Fecha: " + new Date().toLocaleDateString()
+        ]
+    ],
+    {
+        origin: "A1"
+    }
 );
 
-const enlace = document.createElement("a");
-enlace.href = URL.createObjectURL(blob);
-enlace.download = archivo;
-enlace.click();
 
-URL.revokeObjectURL(enlace.href);
 
-    mostrarMensaje("Excel exportado", "exito");
+// ===============================
+// ANCHO DE COLUMNAS
+// ===============================
+
+hoja["!cols"] = [
+
+    { wch: 20 }, // EAN
+    { wch: 16 }, // Interno
+    { wch: 45 }, // Descripción
+    { wch: 12 }, // Cantidad
+    { wch: 35 }  // Observación
+
+];
+
+
+
+// ===============================
+// BORDES
+// ===============================
+
+const rango = XLSX.utils.decode_range(
+    hoja["!ref"]
+);
+
+
+for (
+    let fila = rango.s.r;
+    fila <= rango.e.r;
+    fila++
+) {
+
+    for (
+        let columna = rango.s.c;
+        columna <= rango.e.c;
+        columna++
+    ) {
+
+
+        const celda =
+            hoja[
+                XLSX.utils.encode_cell({
+                    r:fila,
+                    c:columna
+                })
+            ];
+
+
+        if (celda) {
+
+            celda.s = {
+
+                border: {
+
+                    top:{
+                        style:"thin",
+                        color:{
+                            rgb:"000000"
+                        }
+                    },
+
+                    bottom:{
+                        style:"thin",
+                        color:{
+                            rgb:"000000"
+                        }
+                    },
+
+                    left:{
+                        style:"thin",
+                        color:{
+                            rgb:"000000"
+                        }
+                    },
+
+                    right:{
+                        style:"thin",
+                        color:{
+                            rgb:"000000"
+                        }
+                    }
+
+                }
+
+            };
+
+        }
+
+    }
+
+}
+
+
+
+// Filtro en encabezados
+
+hoja["!autofilter"] = {
+
+    ref:
+    "A4:E" + (datos.length + 4)
+
+};
+
+
+XLSX.utils.book_append_sheet(
+    libro,
+    hoja,
+    "Inventario"
+);
+
+
+
+    const fecha =
+        new Date()
+        .toISOString()
+        .slice(
+            0,
+            10
+        );
+
+
+
+    const archivo =
+        `inventario_${fecha}.xlsx`;
+
+
+
+    const buffer =
+        XLSX.write(
+            libro,
+            {
+                bookType:"xlsx",
+                type:"array"
+            }
+        );
+
+
+
+    const blob =
+        new Blob(
+            [buffer],
+            {
+                type:
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            }
+        );
+
+
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+
+
+    const enlace =
+        document.createElement(
+            "a"
+        );
+
+
+    enlace.href = url;
+
+    enlace.download = archivo;
+
+
+
+    document.body.appendChild(
+        enlace
+    );
+
+
+    enlace.click();
+
+
+
+    document.body.removeChild(
+        enlace
+    );
+
+
+
+    setTimeout(
+        ()=>{
+            URL.revokeObjectURL(
+                url
+            );
+        },
+        1000
+    );
+
+
+
+    mostrarMensaje(
+        "Excel exportado",
+        "exito"
+    );
+
 }
