@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Control de ingreso</title>
+    <title>CONTROL DE INGRESOS</title>
 
     <meta name="theme-color" content="#1565C0">
 
@@ -30,7 +30,7 @@
 <header class="topbar">
 
     <div>
-        <h1>📦 Control de ingreso</h1>
+        <h1>📦 CONTROL DE INGRESOS</h1>
     </div>
 
     <button id="btnTema" aria-label="Cambiar tema">
@@ -38,33 +38,6 @@
     </button>
 
 </header>
-
-<!-- ===================== -->
-<!-- DASHBOARD -->
-<!-- ===================== -->
-
-<section class="dashboard">
-
-    <div class="stat">
-        <strong id="cantidadArticulos" class="stat-value">0</strong>
-        <span class="stat-label">Artículos</span>
-    </div>
-
-    <span class="stat-divider"></span>
-
-    <div class="stat">
-        <strong id="totalUnidades" class="stat-value">0</strong>
-        <span class="stat-label">Unidades</span>
-    </div>
-
-    <span class="stat-divider"></span>
-
-    <div class="stat stat-wide">
-        <strong id="ultimoArticulo" class="stat-value stat-value-text">-</strong>
-        <span class="stat-label">Último</span>
-    </div>
-
-</section>
 
 <!-- ===================== -->
 <!-- MAESTRO (compacto) -->
@@ -92,19 +65,6 @@
 </section>
 
 <!-- ===================== -->
-<!-- BUSCADOR -->
-<!-- ===================== -->
-
-<section class="panel panel-buscar">
-
-    <input
-        type="text"
-        id="buscar"
-        placeholder="🔍 Buscar por EAN, interno o descripción...">
-
-</section>
-
-<!-- ===================== -->
 <!-- INGRESO -->
 <!-- ===================== -->
 
@@ -118,7 +78,7 @@
             id="codigo"
             type="text"
             placeholder="Escanear EAN"
-            autofocus>
+            autofocus required>
 
         <input
             id="cantidad"
@@ -136,13 +96,50 @@
     <div class="acciones-grid">
 
         <button id="btnAgregar">➕ Agregar</button>
-        <button id="btnCamara">📷 Cámara</button>
-        <button id="btnNueva" class="btn-secundario">🗑 Nueva</button>
-        <button id="btnExportar" class="btn-secundario">📄 Excel</button>
+        <button id="btnNueva" class="btn-secundario">🗑 Borrar listado</button>
+        <button id="btnExportar" class="btn-secundario">📄 Exportar a Excel</button>
 
     </div>
 
-    <div id="lectorCamara"></div>
+</section>
+
+<!-- ===================== -->
+<!-- BUSCADOR -->
+<!-- ===================== -->
+
+<section class="panel panel-buscar">
+
+    <input
+        type="text"
+        id="buscar"
+        placeholder="🔍 Filtrar lista por EAN, interno o descripción...">
+
+</section>
+
+<!-- ===================== -->
+<!-- DASHBOARD -->
+<!-- ===================== -->
+
+<section class="dashboard">
+
+    <div class="stat">
+        <strong id="cantidadArticulos" class="stat-value">0</strong>
+        <span class="stat-label">Artículos</span>
+    </div>
+
+    <span class="stat-divider"></span>
+
+    <div class="stat">
+        <strong id="totalUnidades" class="stat-value">0</strong>
+        <span class="stat-label">Unidades</span>
+    </div>
+
+    <span class="stat-divider"></span>
+
+    <div class="stat stat-wide">
+        <strong id="ultimoArticulo" class="stat-value stat-value-text">-</strong>
+        <span class="stat-label">Último</span>
+    </div>
 
 </section>
 
@@ -186,7 +183,7 @@
 <!-- ===================== -->
 
 <footer>
-    Scanner Inventario v2.0
+    Control de ingresos 2.0 - Mathias Carrozzino.
 </footer>
 
 <!-- ===================== -->
