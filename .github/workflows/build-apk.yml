@@ -33,9 +33,6 @@ jobs:
       - name: Crear el proyecto nativo de Android
         run: npx cap add android
 
-      - name: Crear el proyecto nativo de Android
-        run: npx cap add android
-
       - name: Solucionar conflicto de versiones de Kotlin
         run: |
           cat >> android/build.gradle << 'EOF'
