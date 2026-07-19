@@ -1,0 +1,10 @@
+{
+  "name": "control-ingreso",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Control de ingreso - app de escaneo de inventario",
+  "scripts": {
+    "sync": "npx cap sync",
+    "android": "npx cap open android"
+  }
+}
