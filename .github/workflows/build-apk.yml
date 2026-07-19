@@ -27,7 +27,7 @@ jobs:
       - name: Instalar dependencias de Capacitor
         run: npm install @capacitor/core @capacitor/cli @capacitor/android
 
-        - name: Borrar carpeta android si ya existe (evita conflicto)
+      - name: Borrar carpeta android si ya existe (evita conflicto)
         run: rm -rf android
 
       - name: Crear el proyecto nativo de Android
