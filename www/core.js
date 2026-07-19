@@ -1115,26 +1115,65 @@ XLSX.utils.book_append_sheet(
             const base64 =
                 arrayBufferABase64(buffer);
 
-            await window.Capacitor.Plugins.Filesystem.writeFile({
-                path: archivo,
-                data: base64,
-                directory: "DOCUMENTS",
-                recursive: true
-            });
+            const resultado =
+                await window.Capacitor.Plugins.Filesystem.writeFile({
+                    path: archivo,
+                    data: base64,
+                    directory: "CACHE",
+                    recursive: true
+                });
 
-            mostrarMensaje(
-                "Excel guardado en Documentos: " + archivo,
-                "exito"
-            );
+
+            // Abrir el selector nativo de compartir para que el usuario
+            // elija dónde guardarlo/enviarlo (Drive, WhatsApp, Gmail,
+            // "Guardar en archivos", etc). Necesario porque el archivo
+            // queda en una carpeta privada de la app que Android no deja
+            // ver desde un explorador de archivos normal.
+
+            if (window.Capacitor.Plugins.Share) {
+
+                await window.Capacitor.Plugins.Share.share({
+                    title: "Inventario",
+                    text: "Listado de inventario: " + archivo,
+                    files: [resultado.uri],
+                    dialogTitle: "Guardar o enviar Excel"
+                });
+
+                mostrarMensaje(
+                    "Excel listo para guardar o enviar",
+                    "exito"
+                );
+
+            } else {
+
+                mostrarMensaje(
+                    "Excel guardado (falta el plugin Share para compartirlo)",
+                    "exito"
+                );
+
+            }
 
         } catch (error) {
 
-            console.error(error);
+            // El usuario cierra el selector de compartir sin elegir nada:
+            // no es un error real, el archivo ya está guardado.
+            if (error && error.message === "Share canceled") {
 
-            mostrarMensaje(
-                "No se pudo guardar el Excel en el dispositivo",
-                "error"
-            );
+                mostrarMensaje(
+                    "Excel guardado",
+                    "exito"
+                );
+
+            } else {
+
+                console.error(error);
+
+                mostrarMensaje(
+                    "No se pudo guardar el Excel en el dispositivo",
+                    "error"
+                );
+
+            }
 
         }
 
