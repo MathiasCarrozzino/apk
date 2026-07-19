@@ -1,0 +1,916 @@
+/* ===========================
+   VARIABLES
+=========================== */
+
+:root{
+
+    --primario:#1565C0;
+    --primario-light:#4C8DDB;
+    --primario-dark:#0D47A1;
+
+    --fondo:#eef1f5;
+    --panel:#ffffff;
+
+    --texto:#1a1d23;
+    --texto-sec:#6b7280;
+
+    --borde:#dde2e8;
+
+    --verde:#2E7D32;
+    --rojo:#C62828;
+
+    --sombra:0 1px 2px rgba(15,23,42,.06),0 1px 8px rgba(15,23,42,.05);
+
+    --radio:8px;
+    --radio-sm:6px;
+
+    --font-ui:'Inter',system-ui,-apple-system,Segoe UI,sans-serif;
+    --font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Consolas,monospace;
+
+}
+
+/* ========= MODO OSCURO ========= */
+
+body.dark{
+
+    --fondo:#0f1216;
+
+    --panel:#1a1d23;
+
+    --texto:#e8eaed;
+
+    --texto-sec:#9aa1ab;
+
+    --borde:#2a2e37;
+
+    --sombra:0 1px 2px rgba(0,0,0,.3),0 1px 10px rgba(0,0,0,.35);
+
+}
+
+/* ========================= */
+
+*{
+
+    margin:0;
+
+    padding:0;
+
+    box-sizing:border-box;
+
+}
+
+body{
+
+    background:var(--fondo);
+
+    color:var(--texto);
+
+    font-family:var(--font-ui);
+
+    font-size:14px;
+
+    line-height:1.4;
+
+    transition:background .2s,color .2s;
+
+    padding:14px;
+
+    max-width:1100px;
+
+    margin:0 auto;
+
+}
+
+/* ===========================
+HEADER
+=========================== */
+
+.topbar{
+
+    background:linear-gradient(135deg,var(--primario),var(--primario-light));
+
+    color:white;
+
+    padding:14px 18px;
+
+    border-radius:var(--radio);
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:12px;
+
+    box-shadow:var(--sombra);
+
+}
+
+.topbar h1{
+
+    font-size:19px;
+
+    font-weight:600;
+
+    letter-spacing:-.01em;
+
+}
+
+#btnTema{
+
+    width:36px;
+
+    height:36px;
+
+    border-radius:50%;
+
+    font-size:16px;
+
+    background:rgba(255,255,255,.15);
+
+    padding:0;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+}
+
+#btnTema:hover{
+
+    background:rgba(255,255,255,.28);
+
+    transform:none;
+
+}
+
+/* ===========================
+DASHBOARD
+=========================== */
+
+.dashboard{
+
+    background:var(--panel);
+
+    border-radius:var(--radio);
+
+    box-shadow:var(--sombra);
+
+    padding:10px 16px;
+
+    margin-bottom:10px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:18px;
+
+}
+
+.stat{
+
+    display:flex;
+
+    align-items:baseline;
+
+    gap:7px;
+
+    min-width:0;
+
+}
+
+.stat-wide{
+
+    flex:1;
+
+    min-width:0;
+
+}
+
+.stat-value{
+
+    font-family:var(--font-mono);
+
+    font-variant-numeric:tabular-nums;
+
+    font-size:19px;
+
+    font-weight:600;
+
+    color:var(--primario);
+
+}
+
+.stat-value-text{
+
+    font-size:14px;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+    display:inline-block;
+
+    max-width:100%;
+
+}
+
+.stat-label{
+
+    font-size:11px;
+
+    color:var(--texto-sec);
+
+    text-transform:uppercase;
+
+    letter-spacing:.04em;
+
+}
+
+.stat-divider{
+
+    width:1px;
+
+    align-self:stretch;
+
+    background:var(--borde);
+
+}
+
+/* ===========================
+MAESTRO (barra compacta,
+poco protagonismo)
+=========================== */
+
+.maestro-bar{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:12px;
+
+    padding:6px 4px;
+
+    margin-bottom:12px;
+
+    font-size:12.5px;
+
+    color:var(--texto-sec);
+
+    flex-wrap:wrap;
+
+}
+
+.maestro-file{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    cursor:pointer;
+
+    position:relative;
+
+}
+
+.maestro-file:hover{
+
+    color:var(--primario);
+
+}
+
+.maestro-file input[type="file"]{
+
+    position:absolute;
+
+    inset:0;
+
+    opacity:0;
+
+    cursor:pointer;
+
+    width:100%;
+
+}
+
+.switch-compact{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    cursor:pointer;
+
+}
+
+.switch-compact input{
+
+    display:none;
+
+}
+
+.switch-compact .slider{
+
+    width:30px;
+
+    height:17px;
+
+    background:var(--borde);
+
+    border-radius:20px;
+
+    position:relative;
+
+    transition:.2s;
+
+    flex-shrink:0;
+
+}
+
+.switch-compact .slider::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:13px;
+
+    height:13px;
+
+    border-radius:50%;
+
+    background:white;
+
+    top:2px;
+
+    left:2px;
+
+    transition:.2s;
+
+    box-shadow:0 1px 2px rgba(0,0,0,.25);
+
+}
+
+.switch-compact input:checked + .slider{
+
+    background:var(--primario);
+
+}
+
+.switch-compact input:checked + .slider::before{
+
+    transform:translateX(13px);
+
+}
+
+.switch-text{
+
+    font-size:12.5px;
+
+}
+
+/* ===========================
+PANELES
+=========================== */
+
+.panel{
+
+    background:var(--panel);
+
+    border-radius:var(--radio);
+
+    padding:14px 16px;
+
+    margin-bottom:12px;
+
+    box-shadow:var(--sombra);
+
+}
+
+.panel-buscar{
+
+    padding:8px 10px;
+
+}
+
+.panel h2{
+
+    margin-bottom:10px;
+
+    color:var(--texto);
+
+    font-size:13px;
+
+    font-weight:600;
+
+    text-transform:uppercase;
+
+    letter-spacing:.03em;
+
+}
+
+/* ===========================
+INPUTS
+=========================== */
+
+input{
+
+    width:100%;
+
+    border:1px solid var(--borde);
+
+    border-radius:var(--radio-sm);
+
+    padding:9px 11px;
+
+    font-size:14px;
+
+    font-family:inherit;
+
+    background:var(--panel);
+
+    color:var(--texto);
+
+    transition:border-color .15s,box-shadow .15s;
+
+}
+
+input:focus{
+
+    outline:none;
+
+    border-color:var(--primario);
+
+    box-shadow:0 0 0 3px rgba(21,101,192,.15);
+
+}
+
+#buscar{
+
+    border:none;
+
+    padding:6px 4px;
+
+    font-size:13.5px;
+
+}
+
+#buscar:focus{
+
+    box-shadow:none;
+
+}
+
+.formulario{
+
+    display:grid;
+
+    grid-template-columns:2fr 90px 2fr;
+
+    gap:8px;
+
+    margin-bottom:10px;
+
+}
+
+/* ===========================
+BOTONES
+=========================== */
+
+button{
+
+    border:none;
+
+    background:var(--primario);
+
+    color:white;
+
+    border-radius:var(--radio-sm);
+
+    cursor:pointer;
+
+    padding:9px 12px;
+
+    font-size:13.5px;
+
+    font-weight:500;
+
+    font-family:inherit;
+
+    transition:background .15s,transform .1s;
+
+}
+
+button:hover{
+
+    background:var(--primario-dark);
+
+    transform:translateY(-1px);
+
+}
+
+button:active{
+
+    transform:scale(.98);
+
+}
+
+.btn-secundario{
+
+    background:var(--fondo);
+
+    color:var(--texto);
+
+    border:1px solid var(--borde);
+
+}
+
+.btn-secundario:hover{
+
+    background:var(--borde);
+
+}
+
+.acciones-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:8px;
+
+}
+
+/* ===========================
+TABLA
+=========================== */
+
+.panel-inventario{
+
+    padding-bottom:8px;
+
+}
+
+.tabla{
+
+    overflow:auto;
+
+    border-radius:var(--radio-sm);
+
+    max-height:60vh;
+
+}
+
+table{
+
+    width:100%;
+
+    min-width:820px;
+
+    border-collapse:collapse;
+
+    font-size:13px;
+
+}
+
+thead{
+
+    background:var(--primario);
+
+    color:white;
+
+    position:sticky;
+
+    top:0;
+
+    z-index:1;
+
+}
+
+th{
+
+    padding:8px 10px;
+
+    font-weight:600;
+
+    font-size:11.5px;
+
+    text-transform:uppercase;
+
+    letter-spacing:.03em;
+
+    text-align:left;
+
+}
+
+td{
+
+    padding:6px 10px;
+
+    border-bottom:1px solid var(--borde);
+
+}
+
+td:nth-child(1),
+td:nth-child(2){
+
+    font-family:var(--font-mono);
+
+    font-size:12.5px;
+
+    color:var(--texto-sec);
+
+}
+
+tbody tr:hover{
+
+    background:rgba(21,101,192,.06);
+
+}
+
+td input{
+
+    padding:5px 7px;
+
+    font-size:13px;
+
+}
+
+.btnEliminar{
+
+    background:transparent;
+
+    color:var(--rojo);
+
+    padding:4px 8px;
+
+}
+
+.btnEliminar:hover{
+
+    background:rgba(198,40,40,.1);
+
+    transform:none;
+
+}
+
+/* ===========================
+LISTA MOBILE
+=========================== */
+
+.lista-mobile{
+
+    display:none;
+
+}
+
+/* ===========================
+CAMARA
+=========================== */
+
+#lectorCamara{
+
+    width:100%;
+
+    max-width:420px;
+
+    margin:14px auto 0;
+
+}
+
+/* ===========================
+MENSAJES
+=========================== */
+
+#mensaje{
+
+    display:none;
+
+    position:fixed;
+
+    bottom:16px;
+
+    right:16px;
+
+    padding:11px 18px;
+
+    color:white;
+
+    border-radius:var(--radio-sm);
+
+    font-size:13.5px;
+
+    font-weight:600;
+
+    box-shadow:var(--sombra);
+
+    z-index:999;
+
+}
+
+.exito{
+
+    background:var(--verde);
+
+}
+
+.error{
+
+    background:var(--rojo);
+
+}
+
+/* ===========================
+FOOTER
+=========================== */
+
+footer{
+
+    text-align:center;
+
+    color:var(--texto-sec);
+
+    font-size:11.5px;
+
+    margin:18px 0 8px;
+
+}
+
+/* ===========================
+TABLET
+=========================== */
+
+@media(max-width:900px){
+
+.formulario{
+
+grid-template-columns:1fr;
+
+}
+
+}
+
+/* ===========================
+CELULAR
+=========================== */
+
+@media(max-width:650px){
+
+body{
+
+padding:8px;
+
+}
+
+.topbar{
+
+padding:12px 14px;
+
+}
+
+.topbar h1{
+
+font-size:16px;
+
+}
+
+.dashboard{
+
+padding:8px 12px;
+
+gap:12px;
+
+}
+
+.stat-value{
+
+font-size:16px;
+
+}
+
+.stat-label{
+
+font-size:10px;
+
+}
+
+.maestro-bar{
+
+font-size:12px;
+
+}
+
+.acciones-grid{
+
+grid-template-columns:1fr 1fr;
+
+}
+
+button{
+
+width:100%;
+
+font-size:13.5px;
+
+}
+
+table{
+
+display:none;
+
+}
+
+.lista-mobile{
+
+display:block;
+
+}
+
+.mobile-card{
+
+background:var(--panel);
+
+border-radius:10px;
+
+padding:12px 14px;
+
+margin-bottom:8px;
+
+box-shadow:var(--sombra);
+
+font-size:13px;
+
+}
+
+.mobile-card h3{
+
+color:var(--primario);
+
+margin-bottom:6px;
+
+font-size:14.5px;
+
+font-weight:600;
+
+}
+
+.mobile-card p{
+
+margin:3px 0;
+
+color:var(--texto-sec);
+
+}
+
+.mobile-card p strong{
+
+color:var(--texto);
+
+font-weight:500;
+
+}
+
+.mobile-actions{
+
+display:flex;
+
+gap:8px;
+
+margin-top:8px;
+
+}
+
+.mobile-actions button{
+
+flex:1;
+
+padding:7px;
+
+}
+
+#mensaje{
+
+left:8px;
+
+right:8px;
+
+bottom:8px;
+
+text-align:center;
+
+}
+
+}

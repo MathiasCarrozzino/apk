@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Control de ingreso</title>
+
+    <meta name="theme-color" content="#1565C0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+
+</head>
+
+<body>
+
+<!-- ===================== -->
+<!-- HEADER -->
+<!-- ===================== -->
+
+<header class="topbar">
+
+    <div>
+        <h1>📦 Control de ingreso</h1>
+    </div>
+
+    <button id="btnTema" aria-label="Cambiar tema">
+        🌙
+    </button>
+
+</header>
+
+<!-- ===================== -->
+<!-- DASHBOARD -->
+<!-- ===================== -->
+
+<section class="dashboard">
+
+    <div class="stat">
+        <strong id="cantidadArticulos" class="stat-value">0</strong>
+        <span class="stat-label">Artículos</span>
+    </div>
+
+    <span class="stat-divider"></span>
+
+    <div class="stat">
+        <strong id="totalUnidades" class="stat-value">0</strong>
+        <span class="stat-label">Unidades</span>
+    </div>
+
+    <span class="stat-divider"></span>
+
+    <div class="stat stat-wide">
+        <strong id="ultimoArticulo" class="stat-value stat-value-text">-</strong>
+        <span class="stat-label">Último</span>
+    </div>
+
+</section>
+
+<!-- ===================== -->
+<!-- MAESTRO (compacto) -->
+<!-- ===================== -->
+
+<section class="maestro-bar">
+
+    <label class="maestro-file">
+        📁 <span id="estado">Sin maestro cargado</span>
+        <input
+            type="file"
+            id="archivoMaestro"
+            accept=".xlsx,.xls,.csv">
+    </label>
+
+    <label class="switch-compact">
+        <input
+            type="checkbox"
+            id="unificar"
+            checked>
+        <span class="slider"></span>
+        <span class="switch-text">Unificar</span>
+    </label>
+
+</section>
+
+<!-- ===================== -->
+<!-- BUSCADOR -->
+<!-- ===================== -->
+
+<section class="panel panel-buscar">
+
+    <input
+        type="text"
+        id="buscar"
+        placeholder="🔍 Buscar por EAN, interno o descripción...">
+
+</section>
+
+<!-- ===================== -->
+<!-- INGRESO -->
+<!-- ===================== -->
+
+<section class="panel">
+
+    <h2>Agregar artículo</h2>
+
+    <div class="formulario">
+
+        <input
+            id="codigo"
+            type="text"
+            placeholder="Escanear EAN"
+            autofocus>
+
+        <input
+            id="cantidad"
+            type="number"
+            value="1"
+            min="1">
+
+        <input
+            id="observacion"
+            type="text"
+            placeholder="Observación">
+
+    </div>
+
+    <div class="acciones-grid">
+
+        <button id="btnAgregar">➕ Agregar</button>
+        <button id="btnCamara">📷 Cámara</button>
+        <button id="btnNueva" class="btn-secundario">🗑 Nueva</button>
+        <button id="btnExportar" class="btn-secundario">📄 Excel</button>
+
+    </div>
+
+    <div id="lectorCamara"></div>
+
+</section>
+
+<!-- ===================== -->
+<!-- LISTA -->
+<!-- ===================== -->
+
+<section class="panel panel-inventario">
+
+    <h2>Inventario</h2>
+
+    <div class="tabla">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>EAN</th>
+                    <th>Interno</th>
+                    <th>Descripción</th>
+                    <th>Cant.</th>
+                    <th>Obs.</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody id="lista">
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- Vista móvil -->
+    <div id="listaMobile" class="lista-mobile"></div>
+
+</section>
+
+<!-- ===================== -->
+<!-- FOOTER -->
+<!-- ===================== -->
+
+<footer>
+    Scanner Inventario v2.0
+</footer>
+
+<!-- ===================== -->
+
+<div id="mensaje"></div>
+
+<script src="storage.js"></script>
+<script src="ui.js"></script>
+<script src="core.js"></script>
+<script src="app.js"></script>
+
+</body>
+
+</html>
