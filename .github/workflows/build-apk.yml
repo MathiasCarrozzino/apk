@@ -30,6 +30,21 @@ jobs:
       - name: Crear el proyecto nativo de Android
         run: npx cap add android
 
+      - name: Solucionar conflicto de versiones de Kotlin
+        run: |
+          cat >> android/build.gradle << 'EOF'
+
+          allprojects {
+              configurations.all {
+                  resolutionStrategy {
+                      force 'org.jetbrains.kotlin:kotlin-stdlib:1.9.24'
+                      force 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.24'
+                      force 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.24'
+                  }
+              }
+          }
+          EOF
+
       - name: Copiar la app web al proyecto nativo
         run: npx cap sync
 
