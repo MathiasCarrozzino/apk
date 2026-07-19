@@ -323,78 +323,24 @@ function exportarExcel() {
     XLSX.utils.book_append_sheet(libro, hoja, "Inventario");
 
     const fecha = new Date().toISOString().slice(0, 10);
-    XLSX.writeFile(libro, `inventario_${fecha}.xlsx`);
+    const archivo = `inventario_${fecha}.xlsx`;
+
+const buffer = XLSX.write(libro, {
+    bookType: "xlsx",
+    type: "array"
+});
+
+const blob = new Blob(
+    [buffer],
+    { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }
+);
+
+const enlace = document.createElement("a");
+enlace.href = URL.createObjectURL(blob);
+enlace.download = archivo;
+enlace.click();
+
+URL.revokeObjectURL(enlace.href);
 
     mostrarMensaje("Excel exportado", "exito");
-}
-
-// ==========================================
-// CÁMARA (html5-qrcode)
-// ==========================================
-
-function alternarCamara() {
-
-    const boton = document.getElementById("btnCamara");
-
-    if (!camaraActiva) {
-
-        const contenedor = document.getElementById("lectorCamara");
-        contenedor.innerHTML = `<div id="qr-reader" style="width:100%"></div>`;
-
-        html5QrCode = new Html5Qrcode("qr-reader");
-
-        html5QrCode.start(
-            { facingMode: "environment" },
-            { fps: 10, qrbox: 250 },
-            (codigoDecodificado) => {
-
-                document.getElementById("codigo").value = codigoDecodificado;
-
-                if (navigator.vibrate)
-                    navigator.vibrate(100);
-
-                detenerCamara();
-
-                document.getElementById("cantidad").focus();
-                document.getElementById("cantidad").select();
-            },
-            () => { /* se ignoran los frames sin código detectado */ }
-
-        ).then(() => {
-
-            camaraActiva = true;
-            boton.textContent = "✖ Cerrar";
-
-        }).catch((error) => {
-
-            console.error(error);
-            mostrarMensaje("No se pudo acceder a la cámara", "error");
-            contenedor.innerHTML = "";
-        });
-
-    } else {
-
-        detenerCamara();
-    }
-}
-
-function detenerCamara() {
-
-    const boton = document.getElementById("btnCamara");
-    const contenedor = document.getElementById("lectorCamara");
-
-    if (html5QrCode) {
-
-        html5QrCode.stop()
-            .then(() => {
-                html5QrCode.clear();
-                contenedor.innerHTML = "";
-            })
-            .catch(() => {
-                contenedor.innerHTML = "";
-            });
-    }
-
-    camaraActiva = false;
-    boton.textContent = "📷 Cámara";
 }

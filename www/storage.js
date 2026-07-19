@@ -193,9 +193,9 @@ function guardarHistorial() {
 
     });
 
-    // Mantener últimos 30
+    // Mantener últimos 100
 
-    historial = historial.slice(0, 30);
+    historial = historial.slice(0, 100);
 
     localStorage.setItem(
 

@@ -59,10 +59,6 @@ function registrarEventos() {
         .addEventListener("click", exportarExcel);
 
     document
-        .getElementById("btnCamara")
-        .addEventListener("click", alternarCamara);
-
-    document
         .getElementById("btnTema")
         .addEventListener("click", cambiarTema);
 
