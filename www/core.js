@@ -18,10 +18,6 @@ let lista = [];
 
 let maestro = [];
 
-let camaraActiva = false;
-
-let html5QrCode = null;
-
 
 
 // ==========================================
@@ -695,7 +691,10 @@ function agregarArticulo() {
 function eventoCodigo(e) {
 
 
-    if (e.key === "Enter") {
+    if(
+ e.key==="Enter" ||
+ e.key==="Tab"
+) {
 
 
         e.preventDefault();
@@ -889,7 +888,7 @@ function nuevaSesion() {
 // EXPORTAR EXCEL
 // ==========================================
 
-function exportarExcel() {
+async function exportarExcel() {
 
 
     if (lista.length === 0) {
@@ -1095,6 +1094,58 @@ XLSX.utils.book_append_sheet(
         );
 
 
+    // ==========================================
+    // GUARDADO NATIVO (dentro de la APK Android)
+    // ==========================================
+
+    const esNativo =
+        window.Capacitor &&
+        typeof window.Capacitor.isNativePlatform === "function" &&
+        window.Capacitor.isNativePlatform();
+
+
+    if (
+        esNativo &&
+        window.Capacitor.Plugins &&
+        window.Capacitor.Plugins.Filesystem
+    ) {
+
+        try {
+
+            const base64 =
+                arrayBufferABase64(buffer);
+
+            await window.Capacitor.Plugins.Filesystem.writeFile({
+                path: archivo,
+                data: base64,
+                directory: "DOCUMENTS",
+                recursive: true
+            });
+
+            mostrarMensaje(
+                "Excel guardado en Documentos: " + archivo,
+                "exito"
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            mostrarMensaje(
+                "No se pudo guardar el Excel en el dispositivo",
+                "error"
+            );
+
+        }
+
+        return;
+
+    }
+
+
+    // ==========================================
+    // RESPALDO (navegador de escritorio / pruebas)
+    // ==========================================
 
     const blob =
         new Blob(
@@ -1126,18 +1177,20 @@ XLSX.utils.book_append_sheet(
 
 
 
-    document.body.appendChild(
-        enlace
-    );
+    document.body.appendChild(enlace);
 
+enlace.dispatchEvent(
+    new MouseEvent(
+        "click",
+        {
+            bubbles:true,
+            cancelable:true,
+            view:window
+        }
+    )
+);
 
-    enlace.click();
-
-
-
-    document.body.removeChild(
-        enlace
-    );
+document.body.removeChild(enlace);
 
 
 
@@ -1156,5 +1209,27 @@ XLSX.utils.book_append_sheet(
         "Excel exportado",
         "exito"
     );
+
+}
+
+
+
+// ==========================================
+// CONVERTIR BUFFER A BASE64 (para Filesystem)
+// ==========================================
+
+function arrayBufferABase64(buffer) {
+
+    let binario = "";
+
+    const bytes = new Uint8Array(buffer);
+
+    for (let i = 0; i < bytes.byteLength; i++) {
+
+        binario += String.fromCharCode(bytes[i]);
+
+    }
+
+    return btoa(binario);
 
 }

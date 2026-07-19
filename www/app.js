@@ -148,14 +148,14 @@ function registrarEventos() {
 
     agregarEvento(
         "codigo",
-        "keypress",
+        "keydown",
         eventoCodigo
     );
 
 
     agregarEvento(
         "cantidad",
-        "keypress",
+        "keydown",
         eventoCantidad
     );
 
