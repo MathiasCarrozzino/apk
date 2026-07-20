@@ -24,8 +24,8 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Instalar dependencias de Capacitor
-        run: npm install @capacitor/core @capacitor/cli @capacitor/android
+      - name: Instalar dependencias
+        run: npm install
 
       - name: Borrar carpeta android si ya existe (evita conflicto)
         run: rm -rf android
