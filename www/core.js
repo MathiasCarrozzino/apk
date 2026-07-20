@@ -888,7 +888,20 @@ function nuevaSesion() {
 // EXPORTAR EXCEL
 // ==========================================
 
+let exportandoExcel = false;
+
 async function exportarExcel() {
+
+    if (exportandoExcel) {
+
+        mostrarMensaje(
+            "Ya se está exportando el Excel, esperá un momento",
+            "error"
+        );
+
+        return;
+
+    }
 
 
     if (lista.length === 0) {
@@ -903,6 +916,14 @@ async function exportarExcel() {
         return;
 
     }
+
+
+    exportandoExcel = true;
+
+    const btnExportar =
+        document.getElementById("btnExportar");
+
+    if (btnExportar) btnExportar.disabled = true;
 
 
 
@@ -1106,6 +1127,9 @@ XLSX.utils.book_append_sheet(
             "error"
         );
 
+        exportandoExcel = false;
+        if (btnExportar) btnExportar.disabled = false;
+
         return;
 
     }
@@ -1119,6 +1143,55 @@ XLSX.utils.book_append_sheet(
         window.Capacitor &&
         typeof window.Capacitor.isNativePlatform === "function" &&
         window.Capacitor.isNativePlatform();
+
+
+    if (
+        esNativo &&
+        window.Capacitor.Plugins &&
+        window.Capacitor.Plugins.FileSharer
+    ) {
+
+        // Guardado directo en la carpeta Descargas del teléfono
+        // (usa MediaStore internamente, sin necesitar permisos
+        // especiales en Android 10+).
+
+        try {
+
+            const base64 =
+                arrayBufferABase64(buffer);
+
+            await window.Capacitor.Plugins.FileSharer.save({
+                filename: archivo,
+                contentType:
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                base64Data: base64,
+                android: {
+                    saveDirectory: "downloads"
+                }
+            });
+
+            mostrarMensaje(
+                "Excel guardado en Descargas",
+                "exito"
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            mostrarMensaje(
+                "No se pudo guardar el Excel en Descargas",
+                "error"
+            );
+
+        }
+
+        exportandoExcel = false;
+        if (btnExportar) btnExportar.disabled = false;
+
+        return;
+
+    }
 
 
     if (
@@ -1194,6 +1267,9 @@ XLSX.utils.book_append_sheet(
 
         }
 
+        exportandoExcel = false;
+        if (btnExportar) btnExportar.disabled = false;
+
         return;
 
     }
@@ -1265,6 +1341,9 @@ document.body.removeChild(enlace);
         "Excel exportado",
         "exito"
     );
+
+    exportandoExcel = false;
+    if (btnExportar) btnExportar.disabled = false;
 
 }
 
