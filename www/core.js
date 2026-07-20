@@ -691,8 +691,14 @@ function agregarArticulo() {
 function eventoCodigo(e) {
 
 
+    const esEnter =
+        e.key === "Enter" ||
+        e.keyCode === 13 ||
+        e.which === 13;
+
+
     if(
- e.key==="Enter" ||
+ esEnter ||
  e.key==="Tab"
 ) {
 
@@ -724,7 +730,13 @@ function eventoCodigo(e) {
 function eventoCantidad(e) {
 
 
-    if (e.key === "Enter") {
+    const esEnter =
+        e.key === "Enter" ||
+        e.keyCode === 13 ||
+        e.which === 13;
+
+
+    if (esEnter) {
 
 
         e.preventDefault();

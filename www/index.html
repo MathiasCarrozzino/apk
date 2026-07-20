@@ -79,14 +79,16 @@
             placeholder="Escanear EAN"
             autofocus
             autocomplete="off"
-            inputmode="numeric">
+            inputmode="numeric"
+            enterkeyhint="next">
 
         <input
             id="cantidad"
-            type="number"
+            type="text"
             placeholder="Cantidad"
-            min="1"
-            inputmode="numeric">
+            inputmode="numeric"
+            pattern="[0-9]*"
+            enterkeyhint="done">
 
         <input
             id="observacion"
