@@ -35,7 +35,15 @@ function dibujarTabla(listaMostrar = lista) {
 
             <td>${articulo.interno}</td>
 
-            <td>${articulo.descripcion}</td>
+            <td>
+
+                <input
+                    type="text"
+                    value="${articulo.descripcion}"
+                    data-id="${indice}"
+                    class="descInput">
+
+            </td>
 
             <td>
 
@@ -102,6 +110,14 @@ function dibujarTarjetas(listaMostrar = lista) {
 
                 ${articulo.descripcion}
 
+                <button
+                    class="btnEditarCampo"
+                    onclick="editarDescripcion(${indice})">
+
+                    ✏️
+
+                </button>
+
             </h3>
 
             <p>
@@ -126,6 +142,14 @@ function dibujarTarjetas(listaMostrar = lista) {
 
                 ${articulo.cantidad}
 
+                <button
+                    class="btnEditarCampo"
+                    onclick="editarCantidad(${indice})">
+
+                    ✏️
+
+                </button>
+
             </p>
 
             <p>
@@ -134,21 +158,22 @@ function dibujarTarjetas(listaMostrar = lista) {
 
                 ${articulo.observacion || "-"}
 
-            </p>
-
-            <div class="mobile-actions">
-
                 <button
-                    onclick="editarArticulo(${indice})">
+                    class="btnEditarCampo"
+                    onclick="editarObservacion(${indice})">
 
                     ✏️
 
                 </button>
 
+            </p>
+
+            <div class="mobile-actions">
+
                 <button
                     onclick="eliminarArticulo(${indice})">
 
-                    🗑
+                    🗑 Eliminar
 
                 </button>
 
@@ -228,6 +253,33 @@ function registrarEventosTabla() {
 
         });
 
+    document.querySelectorAll(".descInput")
+        .forEach(input => {
+
+            input.onchange = function () {
+
+                const valor = this.value.trim();
+
+                if (valor) {
+
+                    lista[this.dataset.id].descripcion = valor;
+
+                    guardarInventario();
+
+                    actualizarDashboard();
+
+                } else {
+
+                    // No dejamos guardar una descripción vacía:
+                    // volvemos a mostrar la que tenía
+                    this.value = lista[this.dataset.id].descripcion;
+
+                }
+
+            };
+
+        });
+
     document.querySelectorAll(".obsInput")
         .forEach(input => {
 
@@ -273,7 +325,28 @@ function eliminarArticulo(indice) {
 // EDITAR
 // =========================================
 
-function editarArticulo(indice) {
+function editarDescripcion(indice) {
+
+    const descripcion = prompt(
+
+        "Descripción",
+
+        lista[indice].descripcion
+
+    );
+
+    if (descripcion === null || descripcion.trim() === "")
+        return;
+
+    lista[indice].descripcion = descripcion.trim();
+
+    guardarInventario();
+
+    actualizarVista();
+
+}
+
+function editarCantidad(indice) {
 
     const cantidad = prompt(
 
@@ -286,18 +359,41 @@ function editarArticulo(indice) {
     if (cantidad === null)
         return;
 
-    lista[indice].cantidad = Number(cantidad);
+    const valor = Number(cantidad);
+
+    if (!valor || valor < 1) {
+
+        mostrarMensaje(
+            "Cantidad no válida",
+            "error"
+        );
+
+        return;
+
+    }
+
+    lista[indice].cantidad = valor;
+
+    guardarInventario();
+
+    actualizarVista();
+
+}
+
+function editarObservacion(indice) {
 
     const obs = prompt(
 
         "Observación",
 
-        lista[indice].observacion
+        lista[indice].observacion || ""
 
     );
 
-    if (obs !== null)
-        lista[indice].observacion = obs;
+    if (obs === null)
+        return;
+
+    lista[indice].observacion = obs;
 
     guardarInventario();
 
