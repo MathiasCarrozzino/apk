@@ -1160,7 +1160,7 @@ XLSX.utils.book_append_sheet(
             "_"
         );
 
-    const archivo =
+    archivo =
         nombreElegido.toLowerCase().endsWith(".xlsx")
             ? nombreElegido
             : `${nombreElegido}.xlsx`;
@@ -1236,11 +1236,6 @@ XLSX.utils.book_append_sheet(
         } catch (error) {
 
             console.error(error);
-
-            alert(
-                "ERROR REAL: " +
-                (error && error.message ? error.message : JSON.stringify(error))
-            );
 
             mostrarMensaje(
                 "No se pudo guardar el Excel en Descargas",
