@@ -1,0 +1,67 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar Java (necesario para Android/Gradle)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Borrar carpeta android si ya existe (evita conflicto)
+        run: rm -rf android
+
+      - name: Crear el proyecto nativo de Android
+        run: npx cap add android
+
+      - name: Generar ícono y splash screen
+        run: npx @capacitor/assets generate --android
+
+      - name: Solucionar conflicto de versiones de Kotlin
+        run: |
+          cat >> android/build.gradle << 'EOF'
+
+          allprojects {
+              configurations.all {
+                  resolutionStrategy {
+                      force 'org.jetbrains.kotlin:kotlin-stdlib:1.9.24'
+                      force 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.24'
+                      force 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.24'
+                  }
+              }
+          }
+          EOF
+
+      - name: Copiar la app web al proyecto nativo
+        run: npx cap sync
+
+      - name: Dar permiso de ejecución a Gradle
+        run: chmod +x android/gradlew
+
+      - name: Compilar la APK (debug)
+        run: cd android && ./gradlew assembleDebug
+
+      - name: Subir la APK como resultado descargable
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
