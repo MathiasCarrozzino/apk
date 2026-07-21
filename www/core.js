@@ -471,7 +471,7 @@ function buscarEnMaestro(codigo) {
 // AGREGAR ARTÍCULO
 // ==========================================
 
-function agregarArticulo() {
+async function agregarArticulo() {
 
 
     const inputCodigo =
@@ -561,6 +561,42 @@ function agregarArticulo() {
 
 
 
+    let descripcion =
+        productoMaestro
+        ?
+        productoMaestro.descripcion
+        :
+        "Sin descripción (no está en el maestro)";
+
+
+    if (!productoMaestro) {
+
+
+        const descripcionEditada =
+            await pedirTextoModal(
+                "Descripción del artículo",
+                descripcion,
+                "text"
+            );
+
+
+        // Canceló: no agregamos el artículo
+        if (descripcionEditada === null) {
+
+            inputCodigo.focus();
+
+            return;
+
+        }
+
+
+        descripcion =
+            descripcionEditada.trim() || descripcion;
+
+    }
+
+
+
     const articulo = {
 
 
@@ -581,12 +617,7 @@ function agregarArticulo() {
 
 
 
-        descripcion:
-        productoMaestro
-        ?
-        productoMaestro.descripcion
-        :
-        "Sin descripción (no está en el maestro)",
+        descripcion,
 
 
 
