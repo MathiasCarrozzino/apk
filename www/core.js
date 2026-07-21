@@ -616,7 +616,8 @@ function agregarArticulo() {
             lista.find(
                 item =>
                 item.ean === articulo.ean &&
-                item.interno === articulo.interno
+                item.interno === articulo.interno &&
+                (item.observacion || "") === observacion
             );
 
 
@@ -626,14 +627,6 @@ function agregarArticulo() {
 
             existente.cantidad += cantidad;
 
-
-
-            if (observacion) {
-
-                existente.observacion =
-                    observacion;
-
-            }
 
 
             if (caja) {
@@ -883,7 +876,7 @@ async function nuevaSesion() {
     const confirmado =
         await pedirConfirmacion(
             "Borrar listado",
-            "¿Seguro que querés borrar todo el inventario actual?",
+            "¿Seguro que querés borrar todo el inventario actual? Se guarda una copia en el historial.",
             "Borrar"
         );
 
