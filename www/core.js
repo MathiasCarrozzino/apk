@@ -862,7 +862,7 @@ async function nuevaSesion() {
     const confirmado =
         await pedirConfirmacion(
             "Borrar listado",
-            "¿Seguro que querés borrar todo el inventario actual? Se guarda una copia en el historial.",
+            "¿Seguro que querés borrar todo el inventario actual?",
             "Borrar"
         );
 
