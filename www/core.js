@@ -492,6 +492,12 @@ function agregarArticulo() {
         );
 
 
+    const inputCaja =
+        document.getElementById(
+            "campoCaja"
+        );
+
+
 
     const codigo =
         inputCodigo.value.trim();
@@ -507,6 +513,10 @@ function agregarArticulo() {
 
     const observacion =
         inputObs.value.trim();
+
+
+    const caja =
+        inputCaja ? inputCaja.value.trim() : "";
 
 
 
@@ -583,7 +593,10 @@ function agregarArticulo() {
         cantidad,
 
 
-        observacion
+        observacion,
+
+
+        caja
 
     };
 
@@ -619,6 +632,14 @@ function agregarArticulo() {
 
                 existente.observacion =
                     observacion;
+
+            }
+
+
+            if (caja) {
+
+                existente.caja =
+                    caja;
 
             }
 
@@ -959,7 +980,9 @@ async function exportarExcel() {
 
                 Cantidad:item.cantidad,
 
-                Observación:item.observacion || ""
+                Observación:item.observacion || "",
+
+                Caja:item.caja || ""
 
 
             })
@@ -999,30 +1022,6 @@ XLSX.utils.sheet_add_aoa(
 
 
 // ===============================
-// CELDA B1 (texto opcional, cargado
-// desde el campo junto al botón Exportar)
-// ===============================
-
-const campoB1 =
-    document.getElementById("celdaB1");
-
-const textoB1 =
-    campoB1 ? campoB1.value.trim() : "";
-
-if (textoB1) {
-
-    const numeroB1 = Number(textoB1);
-
-    hoja["B1"] =
-        (textoB1 !== "" && !isNaN(numeroB1))
-            ? { t: "n", v: numeroB1 }
-            : { t: "s", v: textoB1 };
-
-}
-
-
-
-// ===============================
 // ANCHO DE COLUMNAS
 // ===============================
 
@@ -1032,7 +1031,8 @@ hoja["!cols"] = [
     { wch: 16 }, // Interno
     { wch: 45 }, // Descripción
     { wch: 12 }, // Cantidad
-    { wch: 35 }  // Observación
+    { wch: 35 }, // Observación
+    { wch: 18 }  // Caja
 
 ];
 
@@ -1120,7 +1120,7 @@ for (
 hoja["!autofilter"] = {
 
     ref:
-    "A4:E" + (datos.length + 4)
+    "A4:F" + (datos.length + 4)
 
 };
 
@@ -1265,8 +1265,6 @@ XLSX.utils.book_append_sheet(
                 "exito"
             );
 
-            limpiarCampoB1();
-
         } catch (error) {
 
             console.error(error);
@@ -1326,16 +1324,12 @@ XLSX.utils.book_append_sheet(
                     "exito"
                 );
 
-                limpiarCampoB1();
-
             } else {
 
                 mostrarMensaje(
                     "Excel guardado (falta el plugin Share para compartirlo)",
                     "exito"
                 );
-
-                limpiarCampoB1();
 
             }
 
@@ -1349,8 +1343,6 @@ XLSX.utils.book_append_sheet(
                     "Excel guardado",
                     "exito"
                 );
-
-                limpiarCampoB1();
 
             } else {
 
@@ -1440,8 +1432,6 @@ document.body.removeChild(enlace);
         "exito"
     );
 
-    limpiarCampoB1();
-
     exportandoExcel = false;
     if (btnExportar) btnExportar.disabled = false;
 
@@ -1453,15 +1443,6 @@ document.body.removeChild(enlace);
 // CONVERTIR BUFFER A BASE64 (para Filesystem)
 // ==========================================
 
-function limpiarCampoB1() {
-
-    const campo =
-        document.getElementById("celdaB1");
-
-    if (campo)
-        campo.value = "";
-
-}
 
 function arrayBufferABase64(buffer) {
 
