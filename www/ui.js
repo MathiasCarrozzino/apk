@@ -356,7 +356,13 @@ function cerrarModalEditar() {
 
     document.getElementById("modalEditar").classList.remove("abierto");
 
+    const callback = modalEditarCallback;
+
     modalEditarCallback = null;
+
+    // Avisamos que se canceló, igual que hace prompt() al devolver null
+    if (callback)
+        callback(null);
 
 }
 
@@ -364,10 +370,31 @@ function confirmarModalEditar() {
 
     const valor = document.getElementById("modalEditarInput").value;
 
-    if (modalEditarCallback)
-        modalEditarCallback(valor);
+    document.getElementById("modalEditar").classList.remove("abierto");
 
-    cerrarModalEditar();
+    const callback = modalEditarCallback;
+
+    modalEditarCallback = null;
+
+    if (callback)
+        callback(valor);
+
+}
+
+// Versión con Promise, para usar con "await" en funciones async
+// (por ejemplo, al pedir el nombre del archivo antes de exportar)
+function pedirTextoModal(titulo, valorActual, tipo = "text") {
+
+    return new Promise((resolve) => {
+
+        abrirModalEditar(
+            titulo,
+            valorActual,
+            tipo,
+            (valor) => resolve(valor)
+        );
+
+    });
 
 }
 
@@ -378,6 +405,9 @@ function editarDescripcion(indice) {
         lista[indice].descripcion,
         "text",
         (valor) => {
+
+            if (valor === null)
+                return;
 
             if (valor.trim() === "")
                 return;
@@ -400,6 +430,9 @@ function editarCantidad(indice) {
         lista[indice].cantidad,
         "number",
         (valor) => {
+
+            if (valor === null)
+                return;
 
             const num = Number(valor);
 
@@ -432,6 +465,9 @@ function editarObservacion(indice) {
         lista[indice].observacion || "",
         "text",
         (valor) => {
+
+            if (valor === null)
+                return;
 
             lista[indice].observacion = valor;
 

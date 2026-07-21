@@ -996,6 +996,30 @@ XLSX.utils.sheet_add_aoa(
 
 
 // ===============================
+// CELDA B1 (texto opcional, cargado
+// desde el campo junto al botón Exportar)
+// ===============================
+
+const campoB1 =
+    document.getElementById("celdaB1");
+
+const textoB1 =
+    campoB1 ? campoB1.value.trim() : "";
+
+if (textoB1) {
+
+    const numeroB1 = Number(textoB1);
+
+    hoja["B1"] =
+        (textoB1 !== "" && !isNaN(numeroB1))
+            ? { t: "n", v: numeroB1 }
+            : { t: "s", v: textoB1 };
+
+}
+
+
+
+// ===============================
 // ANCHO DE COLUMNAS
 // ===============================
 
@@ -1131,9 +1155,10 @@ XLSX.utils.book_append_sheet(
 
 
     let nombreElegido =
-        prompt(
-            "Nombre del archivo:",
-            nombreSugerido
+        await pedirTextoModal(
+            "Nombre del archivo",
+            nombreSugerido,
+            "text"
         );
 
     // El usuario tocó "Cancelar": no exportamos nada
@@ -1142,6 +1167,10 @@ XLSX.utils.book_append_sheet(
         document
             .getElementById("codigo")
             .focus();
+
+        exportandoExcel = false;
+
+        if (btnExportar) btnExportar.disabled = false;
 
         return;
 
@@ -1233,6 +1262,8 @@ XLSX.utils.book_append_sheet(
                 "exito"
             );
 
+            limpiarCampoB1();
+
         } catch (error) {
 
             console.error(error);
@@ -1292,12 +1323,16 @@ XLSX.utils.book_append_sheet(
                     "exito"
                 );
 
+                limpiarCampoB1();
+
             } else {
 
                 mostrarMensaje(
                     "Excel guardado (falta el plugin Share para compartirlo)",
                     "exito"
                 );
+
+                limpiarCampoB1();
 
             }
 
@@ -1311,6 +1346,8 @@ XLSX.utils.book_append_sheet(
                     "Excel guardado",
                     "exito"
                 );
+
+                limpiarCampoB1();
 
             } else {
 
@@ -1400,6 +1437,8 @@ document.body.removeChild(enlace);
         "exito"
     );
 
+    limpiarCampoB1();
+
     exportandoExcel = false;
     if (btnExportar) btnExportar.disabled = false;
 
@@ -1410,6 +1449,16 @@ document.body.removeChild(enlace);
 // ==========================================
 // CONVERTIR BUFFER A BASE64 (para Filesystem)
 // ==========================================
+
+function limpiarCampoB1() {
+
+    const campo =
+        document.getElementById("celdaB1");
+
+    if (campo)
+        campo.value = "";
+
+}
 
 function arrayBufferABase64(buffer) {
 

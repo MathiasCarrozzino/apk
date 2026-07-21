@@ -1010,3 +1010,43 @@ gap:10px;
 flex:1;
 
 }
+
+/* ===========================
+GRUPO EXPORTAR + CELDA B1
+=========================== */
+
+.exportar-grupo{
+
+display:flex;
+
+gap:8px;
+
+grid-column:span 2;
+
+}
+
+.exportar-grupo button{
+
+flex:1.2;
+
+white-space:nowrap;
+
+}
+
+.exportar-grupo input{
+
+flex:1;
+
+min-width:0;
+
+}
+
+@media(max-width:650px){
+
+.exportar-grupo{
+
+grid-column:1 / -1;
+
+}
+
+}
