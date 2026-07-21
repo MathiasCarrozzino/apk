@@ -540,9 +540,20 @@ function mostrarMensaje(texto, tipo) {
 
     div.style.display = "block";
 
+    // Reiniciar la animación para que se repita en mensajes seguidos
+    div.classList.remove("mensaje-entrando", "mensaje-saliendo");
+    void div.offsetWidth;
+    div.classList.add("mensaje-entrando");
+
     timerMensaje = setTimeout(() => {
 
-        div.style.display = "none";
+        div.classList.remove("mensaje-entrando");
+        div.classList.add("mensaje-saliendo");
+
+        setTimeout(() => {
+            div.style.display = "none";
+            div.classList.remove("mensaje-saliendo");
+        }, 220);
 
     }, 2500);
 

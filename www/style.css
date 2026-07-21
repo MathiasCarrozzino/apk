@@ -939,7 +939,7 @@ MODAL EDITAR
 
 .modal-overlay{
 
-display:none;
+display:flex;
 
 position:fixed;
 
@@ -955,11 +955,23 @@ justify-content:center;
 
 padding:20px;
 
+opacity:0;
+
+visibility:hidden;
+
+pointer-events:none;
+
+transition:opacity .2s ease;
+
 }
 
 .modal-overlay.abierto{
 
-display:flex;
+opacity:1;
+
+visibility:visible;
+
+pointer-events:auto;
 
 }
 
@@ -976,6 +988,16 @@ width:100%;
 max-width:360px;
 
 box-shadow:var(--sombra);
+
+transform:scale(.9) translateY(8px);
+
+transition:transform .22s cubic-bezier(.2,.9,.3,1.2);
+
+}
+
+.modal-overlay.abierto .modal-box{
+
+transform:scale(1) translateY(0);
 
 }
 
@@ -1060,5 +1082,67 @@ color:var(--texto-sec);
 font-size:13.5px;
 
 line-height:1.5;
+
+}
+
+/* ===========================
+ANIMACIONES GENERALES
+=========================== */
+
+body{
+
+animation:fadeInApp .35s ease-out;
+
+}
+
+@keyframes fadeInApp{
+
+from{ opacity:0; }
+to{ opacity:1; }
+
+}
+
+@keyframes filaEntrar{
+
+from{ opacity:0; transform:translateY(6px); }
+to{ opacity:1; transform:translateY(0); }
+
+}
+
+.mobile-card{
+
+animation:filaEntrar .25s ease-out;
+
+}
+
+tbody tr{
+
+animation:filaEntrar .2s ease-out;
+
+}
+
+@keyframes mensajeEntrar{
+
+from{ opacity:0; transform:translateY(14px) scale(.96); }
+to{ opacity:1; transform:translateY(0) scale(1); }
+
+}
+
+@keyframes mensajeSalir{
+
+from{ opacity:1; transform:translateY(0) scale(1); }
+to{ opacity:0; transform:translateY(14px) scale(.96); }
+
+}
+
+#mensaje.mensaje-entrando{
+
+animation:mensajeEntrar .25s ease-out;
+
+}
+
+#mensaje.mensaje-saliendo{
+
+animation:mensajeSalir .22s ease-in forwards;
 
 }
