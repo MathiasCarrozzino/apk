@@ -300,9 +300,16 @@ function registrarEventosTabla() {
 // ELIMINAR
 // =========================================
 
-function eliminarArticulo(indice) {
+async function eliminarArticulo(indice) {
 
-    if (!confirm("¿Eliminar artículo?"))
+    const confirmado =
+        await pedirConfirmacion(
+            "Eliminar artículo",
+            "¿Seguro que querés eliminar este artículo del inventario?",
+            "Eliminar"
+        );
+
+    if (!confirmado)
         return;
 
     lista.splice(indice, 1);
@@ -395,6 +402,41 @@ function pedirTextoModal(titulo, valorActual, tipo = "text") {
         );
 
     });
+
+}
+
+// =========================================
+// MODAL DE CONFIRMACIÓN (reemplaza confirm())
+// =========================================
+
+let modalConfirmarCallback = null;
+
+function pedirConfirmacion(titulo, mensaje, textoBoton = "Confirmar") {
+
+    return new Promise((resolve) => {
+
+        document.getElementById("modalConfirmarTitulo").textContent = titulo;
+        document.getElementById("modalConfirmarMensaje").textContent = mensaje;
+        document.getElementById("modalConfirmarAceptar").textContent = textoBoton;
+
+        modalConfirmarCallback = resolve;
+
+        document.getElementById("modalConfirmar").classList.add("abierto");
+
+    });
+
+}
+
+function cerrarModalConfirmar(resultado) {
+
+    document.getElementById("modalConfirmar").classList.remove("abierto");
+
+    const callback = modalConfirmarCallback;
+
+    modalConfirmarCallback = null;
+
+    if (callback)
+        callback(resultado);
 
 }
 

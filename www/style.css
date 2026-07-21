@@ -1050,3 +1050,15 @@ grid-column:1 / -1;
 }
 
 }
+
+.modal-box p{
+
+margin-bottom:16px;
+
+color:var(--texto-sec);
+
+font-size:13.5px;
+
+line-height:1.5;
+
+}

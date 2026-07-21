@@ -204,6 +204,36 @@ function registrarEventos() {
     }
 
 
+    // MODAL DE CONFIRMACIÓN
+
+    agregarEvento(
+        "modalConfirmarAceptar",
+        "click",
+        () => cerrarModalConfirmar(true)
+    );
+
+
+    agregarEvento(
+        "modalConfirmarCancelar",
+        "click",
+        () => cerrarModalConfirmar(false)
+    );
+
+
+    const overlayConfirmar = document.getElementById("modalConfirmar");
+
+    if (overlayConfirmar) {
+
+        overlayConfirmar.addEventListener("click", (evento) => {
+
+            if (evento.target === overlayConfirmar)
+                cerrarModalConfirmar(false);
+
+        });
+
+    }
+
+
 
     // GUARDADO AUTOMÁTICO
 

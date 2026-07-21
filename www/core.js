@@ -841,7 +841,7 @@ function buscarArticulos() {
 // NUEVA SESIÓN
 // ==========================================
 
-function nuevaSesion() {
+async function nuevaSesion() {
 
 
     if (lista.length === 0) {
@@ -859,11 +859,14 @@ function nuevaSesion() {
 
 
 
-    if(
-        !confirm(
-            "¿Iniciar una nueva sesión?"
-        )
-    ) {
+    const confirmado =
+        await pedirConfirmacion(
+            "Borrar listado",
+            "¿Seguro que querés borrar todo el inventario actual? Se guarda una copia en el historial.",
+            "Borrar"
+        );
+
+    if (!confirmado) {
 
         return;
 
