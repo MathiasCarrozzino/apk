@@ -1106,18 +1106,64 @@ XLSX.utils.book_append_sheet(
 
 
 
+    const ahora =
+        new Date();
+
     const fecha =
-        new Date()
+        ahora
         .toISOString()
         .slice(
             0,
             10
         );
 
+    const hora =
+        [
+            ahora.getHours(),
+            ahora.getMinutes(),
+            ahora.getSeconds()
+        ]
+        .map(n => String(n).padStart(2, "0"))
+        .join("-");
+
+    const nombreSugerido =
+        `inventario_${fecha}_${hora}`;
 
 
-    archivo =
-        `inventario_${fecha}.xlsx`;
+    let nombreElegido =
+        prompt(
+            "Nombre del archivo:",
+            nombreSugerido
+        );
+
+    // El usuario tocó "Cancelar": no exportamos nada
+    if (nombreElegido === null) {
+
+        document
+            .getElementById("codigo")
+            .focus();
+
+        return;
+
+    }
+
+    nombreElegido = nombreElegido.trim();
+
+    if (!nombreElegido) {
+        nombreElegido = nombreSugerido;
+    }
+
+    // Sacar caracteres no permitidos en nombres de archivo
+    nombreElegido =
+        nombreElegido.replace(
+            /[\\/:*?"<>|]/g,
+            "_"
+        );
+
+    const archivo =
+        nombreElegido.toLowerCase().endsWith(".xlsx")
+            ? nombreElegido
+            : `${nombreElegido}.xlsx`;
 
 
 
