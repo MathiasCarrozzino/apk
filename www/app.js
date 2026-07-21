@@ -160,6 +160,50 @@ function registrarEventos() {
     );
 
 
+    // MODAL DE EDICIÓN
+
+    agregarEvento(
+        "modalEditarGuardar",
+        "click",
+        confirmarModalEditar
+    );
+
+
+    agregarEvento(
+        "modalEditarCancelar",
+        "click",
+        cerrarModalEditar
+    );
+
+
+    agregarEvento(
+        "modalEditarInput",
+        "keydown",
+        (evento) => {
+
+            if (evento.key === "Enter") {
+                evento.preventDefault();
+                confirmarModalEditar();
+            }
+
+        }
+    );
+
+
+    const overlayModal = document.getElementById("modalEditar");
+
+    if (overlayModal) {
+
+        overlayModal.addEventListener("click", (evento) => {
+
+            if (evento.target === overlayModal)
+                cerrarModalEditar();
+
+        });
+
+    }
+
+
 
     // GUARDADO AUTOMÁTICO
 

@@ -325,79 +325,122 @@ function eliminarArticulo(indice) {
 // EDITAR
 // =========================================
 
+// =========================================
+// MODAL DE EDICIÓN (reemplaza prompt())
+// =========================================
+
+let modalEditarCallback = null;
+
+function abrirModalEditar(titulo, valorActual, tipo, callback) {
+
+    const modal = document.getElementById("modalEditar");
+    const input = document.getElementById("modalEditarInput");
+
+    document.getElementById("modalEditarTitulo").textContent = titulo;
+
+    input.type = tipo;
+    input.value = valorActual;
+
+    modalEditarCallback = callback;
+
+    modal.classList.add("abierto");
+
+    setTimeout(() => {
+        input.focus();
+        input.select();
+    }, 50);
+
+}
+
+function cerrarModalEditar() {
+
+    document.getElementById("modalEditar").classList.remove("abierto");
+
+    modalEditarCallback = null;
+
+}
+
+function confirmarModalEditar() {
+
+    const valor = document.getElementById("modalEditarInput").value;
+
+    if (modalEditarCallback)
+        modalEditarCallback(valor);
+
+    cerrarModalEditar();
+
+}
+
 function editarDescripcion(indice) {
 
-    const descripcion = prompt(
-
+    abrirModalEditar(
         "Descripción",
+        lista[indice].descripcion,
+        "text",
+        (valor) => {
 
-        lista[indice].descripcion
+            if (valor.trim() === "")
+                return;
 
+            lista[indice].descripcion = valor.trim();
+
+            guardarInventario();
+
+            actualizarVista();
+
+        }
     );
-
-    if (descripcion === null || descripcion.trim() === "")
-        return;
-
-    lista[indice].descripcion = descripcion.trim();
-
-    guardarInventario();
-
-    actualizarVista();
 
 }
 
 function editarCantidad(indice) {
 
-    const cantidad = prompt(
-
+    abrirModalEditar(
         "Cantidad",
+        lista[indice].cantidad,
+        "number",
+        (valor) => {
 
-        lista[indice].cantidad
+            const num = Number(valor);
 
+            if (!num || num < 1) {
+
+                mostrarMensaje(
+                    "Cantidad no válida",
+                    "error"
+                );
+
+                return;
+
+            }
+
+            lista[indice].cantidad = num;
+
+            guardarInventario();
+
+            actualizarVista();
+
+        }
     );
-
-    if (cantidad === null)
-        return;
-
-    const valor = Number(cantidad);
-
-    if (!valor || valor < 1) {
-
-        mostrarMensaje(
-            "Cantidad no válida",
-            "error"
-        );
-
-        return;
-
-    }
-
-    lista[indice].cantidad = valor;
-
-    guardarInventario();
-
-    actualizarVista();
 
 }
 
 function editarObservacion(indice) {
 
-    const obs = prompt(
-
+    abrirModalEditar(
         "Observación",
+        lista[indice].observacion || "",
+        "text",
+        (valor) => {
 
-        lista[indice].observacion || ""
+            lista[indice].observacion = valor;
 
+            guardarInventario();
+
+            actualizarVista();
+
+        }
     );
-
-    if (obs === null)
-        return;
-
-    lista[indice].observacion = obs;
-
-    guardarInventario();
-
-    actualizarVista();
 
 }
 
