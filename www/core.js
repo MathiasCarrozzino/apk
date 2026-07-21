@@ -1237,6 +1237,11 @@ XLSX.utils.book_append_sheet(
 
             console.error(error);
 
+            alert(
+                "ERROR REAL: " +
+                (error && error.message ? error.message : JSON.stringify(error))
+            );
+
             mostrarMensaje(
                 "No se pudo guardar el Excel en Descargas",
                 "error"
