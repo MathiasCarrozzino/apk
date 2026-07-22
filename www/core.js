@@ -648,7 +648,7 @@ async function agregarArticulo() {
     const unificar =
         document.getElementById(
             "unificar"
-        ).checked;
+        );
 
 
 
