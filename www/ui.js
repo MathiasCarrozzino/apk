@@ -33,6 +33,16 @@ function dibujarTabla(listaMostrar = lista) {
 
             <td>${articulo.ean}</td>
 
+            <td>
+
+                <input
+                    type="text"
+                    value="${articulo.caja || ""}"
+                    data-id="${indice}"
+                    class="cajaInput">
+
+            </td>
+
             <td>${articulo.interno}</td>
 
             <td>
@@ -120,11 +130,31 @@ function dibujarTarjetas(listaMostrar = lista) {
 
             </h3>
 
-            <p>
+            <p class="fila-doble">
 
-                <strong>EAN:</strong>
+                <span>
 
-                ${articulo.ean}
+                    <strong>EAN:</strong>
+
+                    ${articulo.ean}
+
+                </span>
+
+                <span>
+
+                    <strong>Caja:</strong>
+
+                    ${articulo.caja || "-"}
+
+                    <button
+                        class="btnEditarCampo"
+                        onclick="editarCaja(${indice})">
+
+                        ✏️
+
+                    </button>
+
+                </span>
 
             </p>
 
@@ -275,6 +305,60 @@ function registrarEventosTabla() {
                     this.value = lista[this.dataset.id].descripcion;
 
                 }
+
+            };
+
+        });
+
+    document.querySelectorAll(".cajaInput")
+        .forEach(input => {
+
+            input.onchange = function () {
+
+                const indice = Number(this.dataset.id);
+
+                lista[indice].caja = this.value.trim();
+
+
+                const unificar =
+                    document.getElementById("unificar").checked;
+
+                if (unificar) {
+
+                    const articulo = lista[indice];
+
+                    const indiceExistente =
+                        lista.findIndex((item, i) =>
+                            i !== indice &&
+                            item.ean === articulo.ean &&
+                            item.interno === articulo.interno &&
+                            (item.observacion || "") === (articulo.observacion || "") &&
+                            (item.caja || "") === (articulo.caja || "")
+                        );
+
+                    if (indiceExistente !== -1) {
+
+                        lista[indiceExistente].cantidad += articulo.cantidad;
+
+                        lista.splice(indice, 1);
+
+                        mostrarMensaje(
+                            "Se unificó con un artículo existente",
+                            "exito"
+                        );
+
+                        guardarInventario();
+
+                        actualizarVista();
+
+                        return;
+
+                    }
+
+                }
+
+
+                guardarInventario();
 
             };
 
@@ -512,6 +596,61 @@ function editarObservacion(indice) {
                 return;
 
             lista[indice].observacion = valor;
+
+            guardarInventario();
+
+            actualizarVista();
+
+        }
+    );
+
+}
+
+function editarCaja(indice) {
+
+    abrirModalEditar(
+        "Caja",
+        lista[indice].caja || "",
+        "text",
+        (valor) => {
+
+            if (valor === null)
+                return;
+
+            lista[indice].caja = valor.trim();
+
+
+            const unificar =
+                document.getElementById("unificar").checked;
+
+            if (unificar) {
+
+                const articulo = lista[indice];
+
+                const indiceExistente =
+                    lista.findIndex((item, i) =>
+                        i !== indice &&
+                        item.ean === articulo.ean &&
+                        item.interno === articulo.interno &&
+                        (item.observacion || "") === (articulo.observacion || "") &&
+                        (item.caja || "") === (articulo.caja || "")
+                    );
+
+                if (indiceExistente !== -1) {
+
+                    lista[indiceExistente].cantidad += articulo.cantidad;
+
+                    lista.splice(indice, 1);
+
+                    mostrarMensaje(
+                        "Se unificó con un artículo existente",
+                        "exito"
+                    );
+
+                }
+
+            }
+
 
             guardarInventario();
 
