@@ -328,12 +328,10 @@ function registrarEventosTabla() {
                     const articulo = lista[indice];
 
                     const indiceExistente =
-                        lista.findIndex((item, i) =>
-                            i !== indice &&
-                            item.ean === articulo.ean &&
-                            item.interno === articulo.interno &&
-                            (item.observacion || "") === (articulo.observacion || "") &&
-                            (item.caja || "") === (articulo.caja || "")
+                        lista.findIndex(
+                            (item, i) =>
+                                i !== indice &&
+                                sonMismoArticulo(item, articulo)
                         );
 
                     if (indiceExistente !== -1) {
@@ -628,13 +626,11 @@ function editarCaja(indice) {
                 const articulo = lista[indice];
 
                 const indiceExistente =
-                    lista.findIndex((item, i) =>
-                        i !== indice &&
-                        item.ean === articulo.ean &&
-                        item.interno === articulo.interno &&
-                        (item.observacion || "") === (articulo.observacion || "") &&
-                        (item.caja || "") === (articulo.caja || "")
-                    );
+                lista.findIndex(
+                (item, i) =>
+                i !== indice &&
+                sonMismoArticulo(item, articulo)
+                );
 
                 if (indiceExistente !== -1) {
 
