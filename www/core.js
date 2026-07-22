@@ -18,6 +18,18 @@ let lista = [];
 
 let maestro = [];
 
+function sonMismoArticulo(a, b) {
+
+    return (
+
+        a.ean === b.ean &&
+        a.interno === b.interno &&
+        (a.observacion || "") === (b.observacion || "") &&
+        (a.caja || "") === (b.caja || "")
+
+    );
+
+}
 
 
 // ==========================================
@@ -644,12 +656,9 @@ async function agregarArticulo() {
 
 
         const existente =
-            lista.find(
-                item =>
-                item.ean === articulo.ean &&
-                item.interno === articulo.interno &&
-                (item.observacion || "") === observacion
-            );
+    lista.find(
+        item => sonMismoArticulo(item, articulo)
+    );
 
 
 
@@ -657,16 +666,6 @@ async function agregarArticulo() {
 
 
             existente.cantidad += cantidad;
-
-
-
-            if (caja) {
-
-                existente.caja =
-                    caja;
-
-            }
-
 
         } else {
 
