@@ -578,7 +578,7 @@ table{
 
     width:100%;
 
-    min-width:820px;
+    min-width:920px;
 
     border-collapse:collapse;
 
@@ -625,7 +625,8 @@ td{
 }
 
 td:nth-child(1),
-td:nth-child(2){
+td:nth-child(2),
+td:nth-child(3){
 
     font-family:var(--font-mono);
 
@@ -866,6 +867,22 @@ color:var(--texto-sec);
 color:var(--texto);
 
 font-weight:500;
+
+}
+
+.fila-doble{
+
+display:flex;
+
+gap:16px;
+
+}
+
+.fila-doble span{
+
+flex:1;
+
+min-width:0;
 
 }
 
