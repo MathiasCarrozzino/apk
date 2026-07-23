@@ -516,8 +516,15 @@ async function agregarArticulo() {
 
 
 
+    const modoRapido =
+        document.getElementById("modoRapido").checked;
+
+
+
     const cantidad =
-        Number(
+        modoRapido
+        ? 1
+        : Number(
             inputCantidad.value
         );
 
@@ -748,6 +755,19 @@ function eventoCodigo(e) {
 
 
         e.preventDefault();
+
+
+        const modoRapido =
+            document.getElementById("modoRapido").checked;
+
+
+        if (modoRapido) {
+
+            agregarArticulo();
+
+            return;
+
+        }
 
 
 

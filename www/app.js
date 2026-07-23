@@ -143,6 +143,30 @@ function registrarEventos() {
     );
 
 
+    agregarEvento(
+        "modoRapido",
+        "change",
+        function () {
+
+            const cantidad = document.getElementById("cantidad");
+            const observacion = document.getElementById("observacion");
+
+            const activo = this.checked;
+
+            cantidad.disabled = activo;
+            observacion.disabled = activo;
+
+            if (activo) {
+                cantidad.value = "";
+                observacion.value = "";
+            }
+
+            document.getElementById("codigo").focus();
+
+        }
+    );
+
+
 
     // ENTER
 

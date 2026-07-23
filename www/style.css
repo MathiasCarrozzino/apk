@@ -316,6 +316,12 @@ poco protagonismo)
 
 }
 
+.modo-rapido-switch{
+
+    margin-bottom:14px;
+
+}
+
 .switch-compact input{
 
     display:none;
@@ -455,6 +461,16 @@ input:focus{
     border-color:var(--primario);
 
     box-shadow:0 0 0 3px rgba(21,101,192,.15);
+
+}
+
+input:disabled{
+
+    opacity:.45;
+
+    cursor:not-allowed;
+
+    background:var(--fondo);
 
 }
 
