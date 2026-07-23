@@ -177,6 +177,29 @@ function registrarEventos() {
 
 
     agregarEvento(
+        "modalEditarEspacio",
+        "click",
+        () => {
+
+            const input = document.getElementById("modalEditarInput");
+
+            const inicio = input.selectionStart ?? input.value.length;
+            const fin = input.selectionEnd ?? input.value.length;
+
+            input.value =
+                input.value.slice(0, inicio) +
+                " " +
+                input.value.slice(fin);
+
+            input.focus();
+
+            input.setSelectionRange(inicio + 1, inicio + 1);
+
+        }
+    );
+
+
+    agregarEvento(
         "modalEditarInput",
         "keydown",
         (evento) => {

@@ -437,7 +437,10 @@ function abrirModalEditar(titulo, valorActual, tipo, callback) {
     setTimeout(() => {
         input.focus();
         input.select();
-    }, 50);
+        try {
+            input.setSelectionRange(0, input.value.length);
+        } catch (error) {}
+    }, 80);
 
 }
 

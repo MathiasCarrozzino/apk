@@ -905,7 +905,7 @@ async function nuevaSesion() {
 
     const confirmado =
         await pedirConfirmacion(
-            "Borrar listado",
+            "Borrar inventario",
             "¿Seguro que querés borrar todo el inventario actual?",
             "Borrar"
         );
@@ -928,14 +928,30 @@ async function nuevaSesion() {
 
 
 
-    document.getElementById(
-        "buscar"
-    ).value = "";
+    // Reiniciar todos los campos de la pantalla principal
+
+    document.getElementById("codigo").value = "";
+
+    document.getElementById("cantidad").value = "";
+
+    document.getElementById("observacion").value = "";
+
+    document.getElementById("buscar").value = "";
+
+
+    const campoCaja =
+        document.getElementById("campoCaja");
+
+    if (campoCaja)
+        campoCaja.value = "";
+
+
+    document.getElementById("codigo").focus();
 
 
 
     mostrarMensaje(
-        "Nueva sesión iniciada",
+        "Inventario borrado",
         "exito"
     );
 
