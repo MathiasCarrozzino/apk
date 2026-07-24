@@ -32,9 +32,17 @@
         <h1>📦 CONTROL DE INGRESOS</h1>
     </div>
 
-    <button id="btnTema" aria-label="Cambiar tema">
-        🌙
-    </button>
+    <div class="topbar-acciones">
+
+        <button id="btnEmpresas" aria-label="Gestionar empresas" title="Gestionar empresas">
+            🏢
+        </button>
+
+        <button id="btnTema" aria-label="Cambiar tema">
+            🌙
+        </button>
+
+    </div>
 
 </header>
 
@@ -44,13 +52,13 @@
 
 <section class="maestro-bar">
 
-    <label class="maestro-file">
+    <button id="btnAbrirCargaMaestro" class="maestro-file-btn">
         📁 <span id="estado">Sin maestro cargado</span>
-        <input
-            type="file"
-            id="archivoMaestro"
-            accept=".xlsx,.xls,.csv">
-    </label>
+    </button>
+
+    <select id="selectEmpresaActiva" class="selector-empresa-activa">
+        <option value="">Sin empresa</option>
+    </select>
 
     <label class="switch-compact">
         <input
@@ -283,7 +291,96 @@
 
 </div>
 
+<!-- ===================== -->
+<!-- PANTALLA: CARGAR MAESTRO -->
+<!-- ===================== -->
+
+<div id="pantallaCargarMaestro" class="modal-overlay">
+
+    <div class="modal-box pantalla-grande">
+
+        <h3>Cargar maestro</h3>
+
+        <label class="campo-label">Empresa a la que pertenece</label>
+
+        <select id="selectEmpresaCarga">
+
+            <option value="">Elegí una empresa...</option>
+            <option value="__nueva__">➕ Nueva empresa...</option>
+
+        </select>
+
+        <label class="maestro-file campo-archivo">
+
+            📁 Elegir archivo (.xlsx, .xls, .csv)
+
+            <input
+                type="file"
+                id="archivoMaestro"
+                accept=".xlsx,.xls,.csv">
+
+        </label>
+
+        <p id="estadoCargaMaestro" class="texto-ayuda"></p>
+
+        <div class="modal-acciones">
+
+            <button
+                id="btnCerrarCargaMaestro"
+                class="btn-secundario">
+
+                Cerrar
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ===================== -->
+<!-- PANTALLA: EMPRESAS -->
+<!-- ===================== -->
+
+<div id="pantallaEmpresas" class="modal-overlay">
+
+    <div class="modal-box pantalla-grande">
+
+        <h3>Empresas</h3>
+
+        <div id="listaEmpresas" class="lista-empresas"></div>
+
+        <div class="agregar-empresa-fila">
+
+            <input
+                type="text"
+                id="inputNuevaEmpresa"
+                placeholder="Nombre de nueva empresa"
+                maxlength="60">
+
+            <button id="btnAgregarEmpresa">➕</button>
+
+        </div>
+
+        <div class="modal-acciones">
+
+            <button
+                id="btnCerrarPantallaEmpresas"
+                class="btn-secundario">
+
+                Cerrar
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
 <div id="mensaje"></div>
+
 
 <script src="storage.js"></script>
 <script src="ui.js"></script>

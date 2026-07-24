@@ -11,6 +11,12 @@ const STORAGE = {
 
     MAESTRO: "maestro",
 
+    EMPRESAS: "empresas",
+
+    MAESTROS_EMPRESA: "maestrosEmpresa",
+
+    EMPRESA_ACTIVA: "empresaActiva",
+
     CONFIG: "configuracion",
 
     HISTORIAL: "historial"
@@ -53,13 +59,29 @@ function cargarInventarioLocal() {
 // MAESTRO
 // ==========================================
 
-function guardarMaestro() {
+function guardarEmpresas() {
 
     localStorage.setItem(
 
-        STORAGE.MAESTRO,
+        STORAGE.EMPRESAS,
 
-        JSON.stringify(maestro)
+        JSON.stringify(empresas)
+
+    );
+
+    localStorage.setItem(
+
+        STORAGE.MAESTROS_EMPRESA,
+
+        JSON.stringify(maestrosEmpresa)
+
+    );
+
+    localStorage.setItem(
+
+        STORAGE.EMPRESA_ACTIVA,
+
+        empresaActiva || ""
 
     );
 
@@ -67,25 +89,69 @@ function guardarMaestro() {
 
 function cargarMaestroLocal() {
 
-    const datos = localStorage.getItem(
+    const datosEmpresas = localStorage.getItem(
 
-        STORAGE.MAESTRO
+        STORAGE.EMPRESAS
 
     );
 
-    maestro = datos
+    const datosMaestros = localStorage.getItem(
 
-        ? JSON.parse(datos)
+        STORAGE.MAESTROS_EMPRESA
+
+    );
+
+    empresas = datosEmpresas
+
+        ? JSON.parse(datosEmpresas)
 
         : [];
 
-    if (maestro.length > 0) {
+    maestrosEmpresa = datosMaestros
 
-        document.getElementById("estado").textContent =
+        ? JSON.parse(datosMaestros)
 
-            `Maestro cargado (${maestro.length} artículos)`;
+        : {};
+
+    // Migración: si venías de la versión anterior (un solo maestro,
+    // sin empresas), se convierte en la primera empresa
+    if (empresas.length === 0) {
+
+        const maestroViejo = localStorage.getItem(STORAGE.MAESTRO);
+
+        if (maestroViejo) {
+
+            try {
+
+                const listaVieja = JSON.parse(maestroViejo);
+
+                if (Array.isArray(listaVieja) && listaVieja.length > 0) {
+
+                    empresas.push("Empresa 1");
+
+                    maestrosEmpresa["Empresa 1"] = listaVieja;
+
+                }
+
+            } catch (error) {}
+
+        }
 
     }
+
+    empresaActiva = localStorage.getItem(STORAGE.EMPRESA_ACTIVA) || "";
+
+    if (!empresaActiva || empresas.indexOf(empresaActiva) === -1) {
+        empresaActiva = empresas[0] || "";
+    }
+
+    maestro = maestrosEmpresa[empresaActiva] || [];
+
+    if (typeof actualizarSelectorEmpresaActiva === "function")
+        actualizarSelectorEmpresaActiva();
+
+    if (typeof actualizarEstadoMaestro === "function")
+        actualizarEstadoMaestro();
 
 }
 
@@ -237,9 +303,13 @@ function limpiarInventario() {
 
 function limpiarMaestro() {
 
+    if (empresaActiva) {
+        maestrosEmpresa[empresaActiva] = [];
+    }
+
     maestro = [];
 
-    guardarMaestro();
+    guardarEmpresas();
 
 }
 
@@ -257,6 +327,24 @@ function limpiarTodo() {
 
     );
 
+    localStorage.removeItem(
+
+        STORAGE.EMPRESAS
+
+    );
+
+    localStorage.removeItem(
+
+        STORAGE.MAESTROS_EMPRESA
+
+    );
+
+    localStorage.removeItem(
+
+        STORAGE.EMPRESA_ACTIVA
+
+    );
+
 }
 
 // ==========================================
@@ -269,7 +357,11 @@ function exportarBackup() {
 
         fecha: new Date().toISOString(),
 
-        maestro,
+        empresas,
+
+        maestrosEmpresa,
+
+        empresaActiva,
 
         inventario: lista,
 

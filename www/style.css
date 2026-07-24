@@ -117,7 +117,16 @@ HEADER
 
 }
 
-#btnTema{
+.topbar-acciones{
+
+    display:flex;
+
+    gap:10px;
+
+}
+
+#btnTema,
+#btnEmpresas{
 
     width:36px;
 
@@ -139,7 +148,8 @@ HEADER
 
 }
 
-#btnTema:hover{
+#btnTema:hover,
+#btnEmpresas:hover{
 
     background:rgba(255,255,255,.28);
 
@@ -304,6 +314,70 @@ poco protagonismo)
 
 }
 
+.maestro-file-btn{
+
+    background:transparent;
+
+    color:var(--texto-sec);
+
+    border:none;
+
+    padding:4px 0;
+
+    font-size:12.5px;
+
+    font-weight:400;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    flex:1;
+
+    min-width:0;
+
+    text-align:left;
+
+    justify-content:flex-start;
+
+}
+
+.maestro-file-btn:hover{
+
+    color:var(--primario);
+
+    background:transparent;
+
+    transform:none;
+
+}
+
+.maestro-file-btn span{
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+    white-space:nowrap;
+
+}
+
+.selector-empresa-activa{
+
+    width:auto;
+
+    max-width:140px;
+
+    padding:6px 8px;
+
+    font-size:12.5px;
+
+    flex-shrink:0;
+
+}
+
 .switch-compact{
 
     display:flex;
@@ -451,6 +525,40 @@ input{
     color:var(--texto);
 
     transition:border-color .15s,box-shadow .15s;
+
+}
+
+select{
+
+    width:100%;
+
+    border:1px solid var(--borde);
+
+    border-radius:var(--radio-sm);
+
+    padding:9px 11px;
+
+    font-size:14px;
+
+    font-family:inherit;
+
+    background:var(--panel);
+
+    color:var(--texto);
+
+    transition:border-color .15s,box-shadow .15s;
+
+    cursor:pointer;
+
+}
+
+select:focus{
+
+    outline:none;
+
+    border-color:var(--primario);
+
+    box-shadow:0 0 0 3px rgba(21,101,192,.15);
 
 }
 
@@ -1183,5 +1291,165 @@ animation:mensajeEntrar .25s ease-out;
 #mensaje.mensaje-saliendo{
 
 animation:mensajeSalir .22s ease-in forwards;
+
+}
+
+/* ===========================
+PANTALLAS: CARGAR MAESTRO / EMPRESAS
+=========================== */
+
+.pantalla-grande{
+
+max-width:420px;
+
+text-align:left;
+
+}
+
+.campo-label{
+
+display:block;
+
+font-size:12px;
+
+color:var(--texto-sec);
+
+margin-bottom:6px;
+
+margin-top:4px;
+
+}
+
+.pantalla-grande select{
+
+margin-bottom:14px;
+
+}
+
+.campo-archivo{
+
+border:1px solid var(--borde);
+
+background:var(--fondo);
+
+border-radius:var(--radio-sm);
+
+padding:12px;
+
+justify-content:center;
+
+margin-bottom:10px;
+
+}
+
+.texto-ayuda{
+
+font-size:12.5px;
+
+color:var(--texto-sec);
+
+margin-bottom:14px;
+
+min-height:16px;
+
+}
+
+.lista-empresas{
+
+max-height:260px;
+
+overflow-y:auto;
+
+margin-bottom:14px;
+
+}
+
+.fila-empresa{
+
+display:flex;
+
+align-items:center;
+
+justify-content:space-between;
+
+gap:8px;
+
+padding:9px 4px;
+
+border-bottom:1px solid var(--borde);
+
+}
+
+.fila-empresa:last-child{
+
+border-bottom:none;
+
+}
+
+.fila-empresa-nombre{
+
+font-size:14px;
+
+overflow:hidden;
+
+text-overflow:ellipsis;
+
+white-space:nowrap;
+
+}
+
+.fila-empresa-nombre.activa{
+
+color:var(--primario);
+
+font-weight:600;
+
+}
+
+.fila-empresa-acciones{
+
+display:flex;
+
+gap:2px;
+
+flex-shrink:0;
+
+align-items:center;
+
+}
+
+.lista-empresas-vacio{
+
+color:var(--texto-sec);
+
+font-size:13px;
+
+padding:14px 4px;
+
+text-align:center;
+
+}
+
+.agregar-empresa-fila{
+
+display:flex;
+
+gap:8px;
+
+margin-bottom:16px;
+
+}
+
+.agregar-empresa-fila input{
+
+flex:1;
+
+}
+
+.agregar-empresa-fila button{
+
+width:44px;
+
+flex-shrink:0;
 
 }

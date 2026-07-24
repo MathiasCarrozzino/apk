@@ -18,6 +18,12 @@ let lista = [];
 
 let maestro = [];
 
+let empresas = [];
+
+let maestrosEmpresa = {};
+
+let empresaActiva = "";
+
 function sonMismoArticulo(a, b) {
 
     return (
@@ -129,13 +135,34 @@ function cargarMaestroExcel(evento) {
 
 
 
-    const estado =
+    const selectEmpresa =
         document.getElementById(
-            "estado"
+            "selectEmpresaCarga"
+        );
+
+    const empresaElegida =
+        selectEmpresa.value;
+
+    const estadoCarga =
+        document.getElementById(
+            "estadoCargaMaestro"
         );
 
 
-    estado.textContent =
+    if (!empresaElegida) {
+
+        estadoCarga.textContent =
+            "Elegí primero a qué empresa pertenece este maestro.";
+
+        evento.target.value = "";
+
+        return;
+
+    }
+
+
+
+    estadoCarga.textContent =
         "Leyendo archivo...";
 
 
@@ -143,8 +170,8 @@ function cargarMaestroExcel(evento) {
     if (typeof XLSX === "undefined") {
 
 
-        estado.textContent =
-            "Error cargando Excel";
+        estadoCarga.textContent =
+            "Error: la librería Excel no está disponible";
 
 
         mostrarMensaje(
@@ -202,7 +229,7 @@ function cargarMaestroExcel(evento) {
 
 
 
-            maestro =
+            let listaMaestro =
                 filas
                 .map(normalizarFilaMaestro)
                 .filter(
@@ -213,7 +240,7 @@ function cargarMaestroExcel(evento) {
 
 
 
-            if (maestro.length === 0) {
+            if (listaMaestro.length === 0) {
 
 
                 const filasCrudas =
@@ -226,7 +253,7 @@ function cargarMaestroExcel(evento) {
                     );
 
 
-                maestro =
+                listaMaestro =
                     filasCrudas
                     .filter(
                         fila =>
@@ -265,11 +292,11 @@ function cargarMaestroExcel(evento) {
 
 
 
-            if (maestro.length === 0) {
+            if (listaMaestro.length === 0) {
 
 
-                estado.textContent =
-                    "Sin artículos";
+                estadoCarga.textContent =
+                    "No se encontraron artículos en el archivo";
 
 
                 mostrarMensaje(
@@ -284,24 +311,33 @@ function cargarMaestroExcel(evento) {
 
 
 
-            guardarMaestro();
+            maestrosEmpresa[empresaElegida] =
+                listaMaestro;
 
 
+            // Si la empresa del archivo que acabamos de cargar es la
+            // que está activa, refrescamos el maestro que se usa
+            // para buscar al escanear
+            if (empresaElegida === empresaActiva) {
 
-            estado.textContent =
-                `Maestro cargado (${maestro.length} artículos)`;
+                maestro = listaMaestro;
+
+            }
+
+
+            guardarEmpresas();
+
+
+            actualizarEstadoMaestro();
+
+
+            estadoCarga.textContent =
+                `Listo: ${listaMaestro.length} artículos cargados para "${empresaElegida}".`;
 
 
             mostrarMensaje(
                 "Maestro cargado correctamente",
                 "exito"
-            );
-
-
-
-            console.log(
-                "Ejemplo maestro:",
-                maestro[0]
             );
 
 
@@ -314,6 +350,10 @@ function cargarMaestroExcel(evento) {
             );
 
 
+            estadoCarga.textContent =
+                "Error leyendo el archivo";
+
+
             mostrarMensaje(
                 "Error leyendo maestro",
                 "error"
@@ -321,6 +361,15 @@ function cargarMaestroExcel(evento) {
 
         }
 
+
+    };
+
+
+
+    lector.onerror = function() {
+
+        estadoCarga.textContent =
+            "No se pudo leer el archivo";
 
     };
 
@@ -474,6 +523,410 @@ function buscarEnMaestro(codigo) {
 
 
     });
+
+}
+
+
+
+// ==========================================
+// EMPRESAS Y MAESTROS POR EMPRESA
+// ==========================================
+
+function actualizarEstadoMaestro() {
+
+    const estado =
+        document.getElementById("estado");
+
+    if (!estado)
+        return;
+
+    if (!empresaActiva) {
+
+        estado.textContent = "Sin empresa activa";
+
+        return;
+
+    }
+
+    const cantidad =
+        (maestrosEmpresa[empresaActiva] || []).length;
+
+    estado.textContent =
+        cantidad > 0
+        ? `${empresaActiva}: ${cantidad} artículos`
+        : `${empresaActiva}: sin maestro cargado`;
+
+}
+
+function actualizarSelectorEmpresaActiva() {
+
+    const select =
+        document.getElementById("selectEmpresaActiva");
+
+    if (!select)
+        return;
+
+    select.innerHTML = "";
+
+    if (empresas.length === 0) {
+
+        select.innerHTML =
+            `<option value="">Sin empresa</option>`;
+
+        return;
+
+    }
+
+    empresas.forEach(nombre => {
+
+        const opcion =
+            document.createElement("option");
+
+        opcion.value = nombre;
+        opcion.textContent = nombre;
+        opcion.selected = nombre === empresaActiva;
+
+        select.appendChild(opcion);
+
+    });
+
+}
+
+function cambiarEmpresaActiva(nombre) {
+
+    if (!nombre || empresas.indexOf(nombre) === -1)
+        return;
+
+    empresaActiva = nombre;
+
+    maestro = maestrosEmpresa[empresaActiva] || [];
+
+    guardarEmpresas();
+
+    actualizarEstadoMaestro();
+
+    mostrarMensaje(
+        `Trabajando con: ${empresaActiva}`,
+        "exito"
+    );
+
+}
+
+function actualizarSelectEmpresaCarga() {
+
+    const select =
+        document.getElementById("selectEmpresaCarga");
+
+    if (!select)
+        return;
+
+    const valorPrevio = select.value;
+
+    select.innerHTML =
+        `<option value="">Elegí una empresa...</option>` +
+        empresas.map(nombre =>
+            `<option value="${nombre}">${nombre}</option>`
+        ).join("") +
+        `<option value="__nueva__">➕ Nueva empresa...</option>`;
+
+    if (empresas.indexOf(valorPrevio) !== -1) {
+        select.value = valorPrevio;
+    } else if (empresaActiva) {
+        select.value = empresaActiva;
+    }
+
+}
+
+async function manejarSelectEmpresaCarga() {
+
+    const select =
+        document.getElementById("selectEmpresaCarga");
+
+    if (select.value !== "__nueva__")
+        return;
+
+    const nombre =
+        await pedirTextoModal(
+            "Nombre de la nueva empresa",
+            "",
+            "text"
+        );
+
+    if (nombre === null || !nombre.trim()) {
+
+        actualizarSelectEmpresaCarga();
+
+        return;
+
+    }
+
+    const nombreFinal = nombre.trim();
+
+    if (empresas.indexOf(nombreFinal) === -1) {
+
+        empresas.push(nombreFinal);
+
+        maestrosEmpresa[nombreFinal] = [];
+
+        if (!empresaActiva)
+            empresaActiva = nombreFinal;
+
+        guardarEmpresas();
+
+        actualizarSelectorEmpresaActiva();
+
+    }
+
+    actualizarSelectEmpresaCarga();
+
+    select.value = nombreFinal;
+
+}
+
+function abrirPantallaCargarMaestro() {
+
+    actualizarSelectEmpresaCarga();
+
+    document.getElementById("estadoCargaMaestro").textContent = "";
+
+    document.getElementById("pantallaCargarMaestro").classList.add("abierto");
+
+}
+
+function cerrarPantallaCargarMaestro() {
+
+    document.getElementById("pantallaCargarMaestro").classList.remove("abierto");
+
+}
+
+function dibujarListaEmpresas() {
+
+    const contenedor =
+        document.getElementById("listaEmpresas");
+
+    if (!contenedor)
+        return;
+
+    if (empresas.length === 0) {
+
+        contenedor.innerHTML =
+            `<p class="lista-empresas-vacio">Todavía no creaste ninguna empresa.</p>`;
+
+        return;
+
+    }
+
+    contenedor.innerHTML = "";
+
+    empresas.forEach(nombre => {
+
+        const fila = document.createElement("div");
+        fila.className = "fila-empresa";
+
+        const activa = nombre === empresaActiva;
+
+        fila.innerHTML = `
+
+            <span class="fila-empresa-nombre ${activa ? "activa" : ""}">
+                ${nombre}${activa ? " ✓" : ""}
+            </span>
+
+            <span class="fila-empresa-acciones">
+
+                <button class="btnEditarCampo btn-renombrar-empresa" data-nombre="${nombre}" title="Renombrar">
+                    ✏️
+                </button>
+
+                <button class="btnEliminar btn-eliminar-empresa" data-nombre="${nombre}" title="Eliminar">
+                    🗑
+                </button>
+
+            </span>
+
+        `;
+
+        contenedor.appendChild(fila);
+
+    });
+
+    contenedor.querySelectorAll(".btn-renombrar-empresa")
+        .forEach(boton => {
+
+            boton.onclick = () =>
+                renombrarEmpresa(boton.dataset.nombre);
+
+        });
+
+    contenedor.querySelectorAll(".btn-eliminar-empresa")
+        .forEach(boton => {
+
+            boton.onclick = () =>
+                eliminarEmpresa(boton.dataset.nombre);
+
+        });
+
+}
+
+function abrirPantallaEmpresas() {
+
+    dibujarListaEmpresas();
+
+    document.getElementById("inputNuevaEmpresa").value = "";
+
+    document.getElementById("pantallaEmpresas").classList.add("abierto");
+
+}
+
+function cerrarPantallaEmpresas() {
+
+    document.getElementById("pantallaEmpresas").classList.remove("abierto");
+
+}
+
+function agregarEmpresaDesdeInput() {
+
+    const input =
+        document.getElementById("inputNuevaEmpresa");
+
+    const nombre =
+        input.value.trim();
+
+    if (!nombre) {
+
+        mostrarMensaje("Escribí un nombre de empresa", "error");
+
+        return;
+
+    }
+
+    if (empresas.indexOf(nombre) !== -1) {
+
+        mostrarMensaje("Ya existe una empresa con ese nombre", "error");
+
+        return;
+
+    }
+
+    empresas.push(nombre);
+
+    maestrosEmpresa[nombre] = [];
+
+    if (!empresaActiva) {
+
+        empresaActiva = nombre;
+
+        maestro = maestrosEmpresa[empresaActiva];
+
+    }
+
+    guardarEmpresas();
+
+    actualizarSelectorEmpresaActiva();
+
+    actualizarEstadoMaestro();
+
+    dibujarListaEmpresas();
+
+    input.value = "";
+
+    mostrarMensaje("Empresa agregada", "exito");
+
+}
+
+async function renombrarEmpresa(nombreViejo) {
+
+    const nombreNuevo =
+        await pedirTextoModal(
+            "Nombre de la empresa",
+            nombreViejo,
+            "text"
+        );
+
+    if (nombreNuevo === null)
+        return;
+
+    const nombreFinal =
+        nombreNuevo.trim();
+
+    if (!nombreFinal || nombreFinal === nombreViejo)
+        return;
+
+    if (empresas.indexOf(nombreFinal) !== -1) {
+
+        mostrarMensaje("Ya existe una empresa con ese nombre", "error");
+
+        return;
+
+    }
+
+    const indice =
+        empresas.indexOf(nombreViejo);
+
+    if (indice === -1)
+        return;
+
+    empresas[indice] = nombreFinal;
+
+    maestrosEmpresa[nombreFinal] =
+        maestrosEmpresa[nombreViejo] || [];
+
+    delete maestrosEmpresa[nombreViejo];
+
+    if (empresaActiva === nombreViejo) {
+        empresaActiva = nombreFinal;
+    }
+
+    guardarEmpresas();
+
+    actualizarSelectorEmpresaActiva();
+
+    actualizarEstadoMaestro();
+
+    dibujarListaEmpresas();
+
+    mostrarMensaje("Empresa renombrada", "exito");
+
+}
+
+async function eliminarEmpresa(nombre) {
+
+    const confirmado =
+        await pedirConfirmacion(
+            "Eliminar empresa",
+            `¿Seguro que querés eliminar "${nombre}"? También se borra el maestro que tenga cargado (el inventario ya ingresado no se toca).`,
+            "Eliminar"
+        );
+
+    if (!confirmado)
+        return;
+
+    const indice =
+        empresas.indexOf(nombre);
+
+    if (indice === -1)
+        return;
+
+    empresas.splice(indice, 1);
+
+    delete maestrosEmpresa[nombre];
+
+    if (empresaActiva === nombre) {
+
+        empresaActiva = empresas[0] || "";
+
+        maestro = maestrosEmpresa[empresaActiva] || [];
+
+    }
+
+    guardarEmpresas();
+
+    actualizarSelectorEmpresaActiva();
+
+    actualizarEstadoMaestro();
+
+    dibujarListaEmpresas();
+
+    mostrarMensaje("Empresa eliminada", "exito");
 
 }
 
