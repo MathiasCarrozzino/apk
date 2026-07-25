@@ -1983,6 +1983,7 @@ async function enviarExcelPorCorreo() {
 
     const buffer = resultado.buffer;
     const archivo = resultado.archivo;
+    const archivoSinExt = archivo.substring(0, archivo.lastIndexOf('.')) || archivo;
 
     const esNativo =
         window.Capacitor &&
@@ -2007,8 +2008,8 @@ async function enviarExcelPorCorreo() {
                 contentType:
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 base64Data: base64,
-                title: "Inventario",
-                text: "Te comparto el listado de inventario: " + archivo
+                title: "Control: " + archivoSinExt,
+                text: "Te comparto el listado de inventario: " + archivoSinExt
             });
 
             mostrarMensaje(
