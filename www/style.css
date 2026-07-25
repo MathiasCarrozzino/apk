@@ -1188,6 +1188,8 @@ GRUPO EXPORTAR + CELDA B1
 
 display:flex;
 
+flex-wrap:wrap;
+
 gap:8px;
 
 grid-column:span 2;
@@ -1196,7 +1198,7 @@ grid-column:span 2;
 
 .exportar-grupo button{
 
-flex:1.2;
+flex:1 1 calc(50% - 4px);
 
 white-space:nowrap;
 
@@ -1204,7 +1206,7 @@ white-space:nowrap;
 
 .exportar-grupo input{
 
-flex:1;
+flex:1 1 100%;
 
 min-width:0;
 
@@ -1215,6 +1217,12 @@ min-width:0;
 .exportar-grupo{
 
 grid-column:1 / -1;
+
+}
+
+.exportar-grupo button{
+
+flex:1 1 100%;
 
 }
 

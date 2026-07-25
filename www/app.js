@@ -123,6 +123,13 @@ function registrarEventos() {
 
 
     agregarEvento(
+        "btnEnviarCorreo",
+        "click",
+        enviarExcelPorCorreo
+    );
+
+
+    agregarEvento(
         "btnTema",
         "click",
         cambiarTema

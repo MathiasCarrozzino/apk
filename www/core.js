@@ -1438,51 +1438,14 @@ async function nuevaSesion() {
 
 let exportandoExcel = false;
 
-async function exportarExcel() {
+async function generarLibroExcel() {
 
-    if (exportandoExcel) {
-
-        mostrarMensaje(
-            "Ya se está exportando el Excel, esperá un momento",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    if (lista.length === 0) {
-
-
-        mostrarMensaje(
-            "No hay artículos para exportar",
-            "error"
-        );
-
-
-        return;
-
-    }
-
-
-    exportandoExcel = true;
-
-    const btnExportar =
-        document.getElementById("btnExportar");
-
-    if (btnExportar) btnExportar.disabled = true;
-
-
-
-    let buffer, archivo;
-
-    try {
+    // Arma el workbook y pide el nombre del archivo.
+    // Devuelve {buffer, archivo}, o null si el usuario cancela el nombre.
 
     const datos =
         lista.map(
             item => ({
-
 
                 EAN:item.ean,
 
@@ -1496,165 +1459,141 @@ async function exportarExcel() {
 
                 Caja:item.caja || ""
 
-
             })
         );
 
-
-
     const hoja = XLSX.utils.json_to_sheet(datos, {
-    origin: "A4"
-});
+        origin: "A4"
+    });
 
-const libro = XLSX.utils.book_new();
+    const libro = XLSX.utils.book_new();
 
 
-// ===============================
-// CABECERA
-// ===============================
+    // ===============================
+    // CABECERA
+    // ===============================
 
-XLSX.utils.sheet_add_aoa(
-    hoja,
-    [
-        ["CONTROL DE INGRESOS"],
-        [""],
+    XLSX.utils.sheet_add_aoa(
+        hoja,
         [
-            "",
-            "",
-            "",
-            "",
-            "Fecha: " + new Date().toLocaleDateString()
-        ]
-    ],
-    {
-        origin: "A1"
-    }
-);
+            ["CONTROL DE INGRESOS"],
+            [""],
+            [
+                "",
+                "",
+                "",
+                "",
+                "Fecha: " + new Date().toLocaleDateString()
+            ]
+        ],
+        {
+            origin: "A1"
+        }
+    );
 
 
+    // ===============================
+    // ANCHO DE COLUMNAS
+    // ===============================
 
-// ===============================
-// ANCHO DE COLUMNAS
-// ===============================
+    hoja["!cols"] = [
 
-hoja["!cols"] = [
+        { wch: 20 }, // EAN
+        { wch: 16 }, // Interno
+        { wch: 45 }, // Descripción
+        { wch: 12 }, // Cantidad
+        { wch: 35 }, // Observación
+        { wch: 18 }  // Caja
 
-    { wch: 20 }, // EAN
-    { wch: 16 }, // Interno
-    { wch: 45 }, // Descripción
-    { wch: 12 }, // Cantidad
-    { wch: 35 }, // Observación
-    { wch: 18 }  // Caja
-
-];
-
+    ];
 
 
-// ===============================
-// BORDES
-// ===============================
+    // ===============================
+    // BORDES
+    // ===============================
 
-const rango = XLSX.utils.decode_range(
-    hoja["!ref"]
-);
-
-
-for (
-    let fila = rango.s.r;
-    fila <= rango.e.r;
-    fila++
-) {
+    const rango = XLSX.utils.decode_range(
+        hoja["!ref"]
+    );
 
     for (
-        let columna = rango.s.c;
-        columna <= rango.e.c;
-        columna++
+        let fila = rango.s.r;
+        fila <= rango.e.r;
+        fila++
     ) {
 
+        for (
+            let columna = rango.s.c;
+            columna <= rango.e.c;
+            columna++
+        ) {
 
-        const celda =
-            hoja[
-                XLSX.utils.encode_cell({
-                    r:fila,
-                    c:columna
-                })
-            ];
+            const celda =
+                hoja[
+                    XLSX.utils.encode_cell({
+                        r:fila,
+                        c:columna
+                    })
+                ];
 
+            if (celda) {
 
-        if (celda) {
+                celda.s = {
 
-            celda.s = {
+                    border: {
 
-                border: {
+                        top:{
+                            style:"thin",
+                            color:{ rgb:"000000" }
+                        },
 
-                    top:{
-                        style:"thin",
-                        color:{
-                            rgb:"000000"
+                        bottom:{
+                            style:"thin",
+                            color:{ rgb:"000000" }
+                        },
+
+                        left:{
+                            style:"thin",
+                            color:{ rgb:"000000" }
+                        },
+
+                        right:{
+                            style:"thin",
+                            color:{ rgb:"000000" }
                         }
-                    },
 
-                    bottom:{
-                        style:"thin",
-                        color:{
-                            rgb:"000000"
-                        }
-                    },
-
-                    left:{
-                        style:"thin",
-                        color:{
-                            rgb:"000000"
-                        }
-                    },
-
-                    right:{
-                        style:"thin",
-                        color:{
-                            rgb:"000000"
-                        }
                     }
 
-                }
+                };
 
-            };
+            }
 
         }
 
     }
 
-}
+    // Filtro en encabezados
+    hoja["!autofilter"] = {
+        ref: "A4:F" + (datos.length + 4)
+    };
+
+    XLSX.utils.book_append_sheet(
+        libro,
+        hoja,
+        "Inventario"
+    );
 
 
+    // ===============================
+    // NOMBRE DEL ARCHIVO
+    // ===============================
 
-// Filtro en encabezados
-
-hoja["!autofilter"] = {
-
-    ref:
-    "A4:F" + (datos.length + 4)
-
-};
-
-
-XLSX.utils.book_append_sheet(
-    libro,
-    hoja,
-    "Inventario"
-);
-
-
-
-    const ahora =
-        new Date();
+    const ahora = new Date();
 
     const fecha =
         ahora
         .toISOString()
-        .slice(
-            0,
-            10
-        );
+        .slice(0, 10);
 
     const hora =
         [
@@ -1668,7 +1607,6 @@ XLSX.utils.book_append_sheet(
     const nombreSugerido =
         `inventario_${fecha}_${hora}`;
 
-
     let nombreElegido =
         await pedirTextoModal(
             "Nombre del archivo",
@@ -1676,19 +1614,9 @@ XLSX.utils.book_append_sheet(
             "text"
         );
 
-    // El usuario tocó "Cancelar": no exportamos nada
+    // El usuario tocó "Cancelar"
     if (nombreElegido === null) {
-
-        document
-            .getElementById("codigo")
-            .focus();
-
-        exportandoExcel = false;
-
-        if (btnExportar) btnExportar.disabled = false;
-
-        return;
-
+        return null;
     }
 
     nombreElegido = nombreElegido.trim();
@@ -1704,14 +1632,12 @@ XLSX.utils.book_append_sheet(
             "_"
         );
 
-    archivo =
+    const archivo =
         nombreElegido.toLowerCase().endsWith(".xlsx")
             ? nombreElegido
             : `${nombreElegido}.xlsx`;
 
-
-
-    buffer =
+    const buffer =
         XLSX.write(
             libro,
             {
@@ -1719,6 +1645,53 @@ XLSX.utils.book_append_sheet(
                 type:"array"
             }
         );
+
+    return { buffer, archivo };
+
+}
+
+
+
+// ==========================================
+// EXPORTAR (GUARDAR EN DESCARGAS)
+// ==========================================
+
+async function exportarExcel() {
+
+    if (exportandoExcel) {
+
+        mostrarMensaje(
+            "Ya se está exportando el Excel, esperá un momento",
+            "error"
+        );
+
+        return;
+
+    }
+
+    if (lista.length === 0) {
+
+        mostrarMensaje(
+            "No hay artículos para exportar",
+            "error"
+        );
+
+        return;
+
+    }
+
+    exportandoExcel = true;
+
+    const btnExportar =
+        document.getElementById("btnExportar");
+
+    if (btnExportar) btnExportar.disabled = true;
+
+    let resultado;
+
+    try {
+
+        resultado = await generarLibroExcel();
 
     } catch (error) {
 
@@ -1735,6 +1708,20 @@ XLSX.utils.book_append_sheet(
         return;
 
     }
+
+    if (!resultado) {
+
+        document.getElementById("codigo").focus();
+
+        exportandoExcel = false;
+        if (btnExportar) btnExportar.disabled = false;
+
+        return;
+
+    }
+
+    const buffer = resultado.buffer;
+    const archivo = resultado.archivo;
 
 
     // ==========================================
@@ -1807,7 +1794,7 @@ XLSX.utils.book_append_sheet(
             const base64 =
                 arrayBufferABase64(buffer);
 
-            const resultado =
+            const resultadoArchivo =
                 await window.Capacitor.Plugins.Filesystem.writeFile({
                     path: archivo,
                     data: base64,
@@ -1815,19 +1802,12 @@ XLSX.utils.book_append_sheet(
                     recursive: true
                 });
 
-
-            // Abrir el selector nativo de compartir para que el usuario
-            // elija dónde guardarlo/enviarlo (Drive, WhatsApp, Gmail,
-            // "Guardar en archivos", etc). Necesario porque el archivo
-            // queda en una carpeta privada de la app que Android no deja
-            // ver desde un explorador de archivos normal.
-
             if (window.Capacitor.Plugins.Share) {
 
                 await window.Capacitor.Plugins.Share.share({
                     title: "Inventario",
                     text: "Listado de inventario: " + archivo,
-                    files: [resultado.uri],
+                    files: [resultadoArchivo.uri],
                     dialogTitle: "Guardar o enviar Excel"
                 });
 
@@ -1847,8 +1827,6 @@ XLSX.utils.book_append_sheet(
 
         } catch (error) {
 
-            // El usuario cierra el selector de compartir sin elegir nada:
-            // no es un error real, el archivo ya está guardado.
             if (error && error.message === "Share canceled") {
 
                 mostrarMensaje(
@@ -1890,54 +1868,36 @@ XLSX.utils.book_append_sheet(
             }
         );
 
-
-
     const url =
-        URL.createObjectURL(
-            blob
-        );
-
-
+        URL.createObjectURL(blob);
 
     const enlace =
-        document.createElement(
-            "a"
-        );
-
+        document.createElement("a");
 
     enlace.href = url;
-
     enlace.download = archivo;
-
-
 
     document.body.appendChild(enlace);
 
-enlace.dispatchEvent(
-    new MouseEvent(
-        "click",
-        {
-            bubbles:true,
-            cancelable:true,
-            view:window
-        }
-    )
-);
+    enlace.dispatchEvent(
+        new MouseEvent(
+            "click",
+            {
+                bubbles:true,
+                cancelable:true,
+                view:window
+            }
+        )
+    );
 
-document.body.removeChild(enlace);
-
-
+    document.body.removeChild(enlace);
 
     setTimeout(
-        ()=>{
-            URL.revokeObjectURL(
-                url
-            );
+        () => {
+            URL.revokeObjectURL(url);
         },
         1000
     );
-
-
 
     mostrarMensaje(
         "Excel exportado",
@@ -1948,6 +1908,139 @@ document.body.removeChild(enlace);
     if (btnExportar) btnExportar.disabled = false;
 
 }
+
+
+
+// ==========================================
+// ENVIAR POR CORREO / COMPARTIR
+// ==========================================
+
+let enviandoExcel = false;
+
+async function enviarExcelPorCorreo() {
+
+    if (enviandoExcel) {
+
+        mostrarMensaje(
+            "Ya se está preparando el envío, esperá un momento",
+            "error"
+        );
+
+        return;
+
+    }
+
+    if (lista.length === 0) {
+
+        mostrarMensaje(
+            "No hay artículos para enviar",
+            "error"
+        );
+
+        return;
+
+    }
+
+    enviandoExcel = true;
+
+    const btnEnviar =
+        document.getElementById("btnEnviarCorreo");
+
+    if (btnEnviar) btnEnviar.disabled = true;
+
+    let resultado;
+
+    try {
+
+        resultado = await generarLibroExcel();
+
+    } catch (error) {
+
+        console.error(error);
+
+        mostrarMensaje(
+            "No se pudo generar el Excel (revisá la cantidad de artículos)",
+            "error"
+        );
+
+        enviandoExcel = false;
+        if (btnEnviar) btnEnviar.disabled = false;
+
+        return;
+
+    }
+
+    if (!resultado) {
+
+        document.getElementById("codigo").focus();
+
+        enviandoExcel = false;
+        if (btnEnviar) btnEnviar.disabled = false;
+
+        return;
+
+    }
+
+    const buffer = resultado.buffer;
+    const archivo = resultado.archivo;
+
+    const esNativo =
+        window.Capacitor &&
+        typeof window.Capacitor.isNativePlatform === "function" &&
+        window.Capacitor.isNativePlatform();
+
+    if (
+        esNativo &&
+        window.Capacitor.Plugins &&
+        window.Capacitor.Plugins.FileSharer
+    ) {
+
+        try {
+
+            const base64 =
+                arrayBufferABase64(buffer);
+
+            // Abre el selector nativo de Android (Gmail, WhatsApp,
+            // Drive, etc). El usuario elige con qué enviarlo.
+            await window.Capacitor.Plugins.FileSharer.share({
+                filename: archivo,
+                contentType:
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                base64Data: base64,
+                title: "Inventario",
+                text: "Te comparto el listado de inventario: " + archivo
+            });
+
+            mostrarMensaje(
+                "Listo para enviar",
+                "exito"
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            mostrarMensaje(
+                "No se pudo abrir el selector para enviar",
+                "error"
+            );
+
+        }
+
+    } else {
+
+        mostrarMensaje(
+            "Esta función solo está disponible dentro de la app instalada",
+            "error"
+        );
+
+    }
+
+    enviandoExcel = false;
+    if (btnEnviar) btnEnviar.disabled = false;
+
+}
+
 
 
 
