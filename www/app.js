@@ -165,11 +165,16 @@ function registrarEventos() {
 
 
     agregarEvento(
-        "selectEmpresaActiva",
-        "change",
-        function () {
-            cambiarEmpresaActiva(this.value);
-        }
+        "btnEmpresaActiva",
+        "click",
+        abrirSelectorEmpresaActiva
+    );
+
+
+    agregarEvento(
+        "btnCerrarSeleccionarEmpresa",
+        "click",
+        cerrarSelectorEmpresaActiva
     );
 
 
@@ -230,6 +235,20 @@ function registrarEventos() {
 
             if (evento.target === overlayEmpresas)
                 cerrarPantallaEmpresas();
+
+        });
+
+    }
+
+
+    const overlaySeleccionarEmpresa = document.getElementById("pantallaSeleccionarEmpresa");
+
+    if (overlaySeleccionarEmpresa) {
+
+        overlaySeleccionarEmpresa.addEventListener("click", (evento) => {
+
+            if (evento.target === overlaySeleccionarEmpresa)
+                cerrarSelectorEmpresaActiva();
 
         });
 

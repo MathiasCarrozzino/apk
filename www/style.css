@@ -364,51 +364,9 @@ poco protagonismo)
 
 }
 
-.selector-empresa-activa{
+.fila-empresa-clickeable{
 
-    -webkit-appearance:none;
-
-    -moz-appearance:none;
-
-    appearance:none;
-
-    width:auto;
-
-    max-width:140px;
-
-    padding:6px 20px 6px 4px;
-
-    font-size:12.5px;
-
-    flex-shrink:0;
-
-    border:none;
-
-    background:
-
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath fill='%23888' d='M1 1l5 5 5-5'/%3E%3C/svg%3E")
-
-        no-repeat right 2px center / 10px 7px,
-
-        transparent;
-
-    color:var(--texto-sec);
-
-    text-overflow:ellipsis;
-
-}
-
-.selector-empresa-activa:hover{
-
-    color:var(--primario);
-
-}
-
-.selector-empresa-activa:focus{
-
-    box-shadow:none;
-
-    color:var(--primario);
+    cursor:pointer;
 
 }
 
@@ -709,6 +667,64 @@ button:active{
     flex-direction:column;
 
     gap:8px;
+
+}
+
+.fila-agregar{
+
+    display:flex;
+
+    gap:8px;
+
+}
+
+.fila-agregar button{
+
+    flex:1.1;
+
+    white-space:nowrap;
+
+}
+
+.fila-agregar input{
+
+    flex:1;
+
+    min-width:0;
+
+}
+
+.fila-exportar{
+
+    display:flex;
+
+    gap:6px;
+
+}
+
+.fila-exportar button{
+
+    flex:1;
+
+    width:auto;
+
+    white-space:nowrap;
+
+    padding:9px 4px;
+
+    font-size:12px;
+
+}
+
+@media(max-width:400px){
+
+    .fila-exportar button{
+
+        font-size:10px;
+
+        padding:8px 2px;
+
+    }
 
 }
 
@@ -1177,16 +1193,6 @@ transition:transform .22s cubic-bezier(.2,.9,.3,1.2);
 .modal-overlay.abierto .modal-box{
 
 transform:scale(1) translateY(0);
-
-}
-
-/* Los cuadros de editar/confirmar deben verse siempre por encima
-   de cualquier pantalla grande (Cargar maestro, Empresas) que
-   pueda estar abierta al mismo tiempo detrás de ellos */
-#modalEditar,
-#modalConfirmar{
-
-z-index:1100;
 
 }
 

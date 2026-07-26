@@ -560,35 +560,86 @@ function actualizarEstadoMaestro() {
 
 function actualizarSelectorEmpresaActiva() {
 
-    const select =
-        document.getElementById("selectEmpresaActiva");
+    const texto =
+        document.getElementById("nombreEmpresaActivaTexto");
 
-    if (!select)
+    if (texto) {
+
+        texto.textContent =
+            empresaActiva || "Sin empresa";
+
+    }
+
+    // Si la pantalla del selector está abierta en este momento,
+    // refrescamos también su lista
+    const pantalla =
+        document.getElementById("pantallaSeleccionarEmpresa");
+
+    if (pantalla && pantalla.classList.contains("abierto")) {
+        dibujarListaSeleccionarEmpresa();
+    }
+
+}
+
+function dibujarListaSeleccionarEmpresa() {
+
+    const contenedor =
+        document.getElementById("listaSeleccionarEmpresa");
+
+    if (!contenedor)
         return;
-
-    select.innerHTML = "";
 
     if (empresas.length === 0) {
 
-        select.innerHTML =
-            `<option value="">Sin empresa</option>`;
+        contenedor.innerHTML =
+            `<p class="lista-empresas-vacio">Todavía no creaste ninguna empresa.</p>`;
 
         return;
 
     }
 
+    contenedor.innerHTML = "";
+
     empresas.forEach(nombre => {
 
-        const opcion =
-            document.createElement("option");
+        const fila = document.createElement("div");
+        fila.className = "fila-empresa fila-empresa-clickeable";
 
-        opcion.value = nombre;
-        opcion.textContent = nombre;
-        opcion.selected = nombre === empresaActiva;
+        const activa = nombre === empresaActiva;
 
-        select.appendChild(opcion);
+        fila.innerHTML = `
+
+            <span class="fila-empresa-nombre ${activa ? "activa" : ""}">
+                ${nombre}${activa ? " ✓" : ""}
+            </span>
+
+        `;
+
+        fila.onclick = () => {
+
+            cambiarEmpresaActiva(nombre);
+
+            cerrarSelectorEmpresaActiva();
+
+        };
+
+        contenedor.appendChild(fila);
 
     });
+
+}
+
+function abrirSelectorEmpresaActiva() {
+
+    dibujarListaSeleccionarEmpresa();
+
+    document.getElementById("pantallaSeleccionarEmpresa").classList.add("abierto");
+
+}
+
+function cerrarSelectorEmpresaActiva() {
+
+    document.getElementById("pantallaSeleccionarEmpresa").classList.remove("abierto");
 
 }
 

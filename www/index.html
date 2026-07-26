@@ -56,9 +56,9 @@
         📁 <span id="estado">Sin maestro cargado</span>
     </button>
 
-    <select id="selectEmpresaActiva" class="selector-empresa-activa">
-        <option value="">Sin empresa</option>
-    </select>
+    <button id="btnEmpresaActiva" class="maestro-file-btn">
+        🏢 <span id="nombreEmpresaActivaTexto">Sin empresa</span>
+    </button>
 
     <label class="switch-compact">
         <input
@@ -114,20 +114,25 @@
 
     <div class="acciones-grid">
 
-        <button id="btnAgregar">➕ Agregar</button>
-        <button id="btnNueva" class="btn-secundario">🗑 Borrar inventario</button>
+        <div class="fila-agregar">
 
-        <div class="exportar-grupo">
-
-            <button id="btnExportar" class="btn-secundario">📄 Exportar a Excel</button>
-
-            <button id="btnEnviarCorreo" class="btn-secundario">📧 Enviar por Gmail</button>
+            <button id="btnAgregar">➕ Agregar</button>
 
             <input
                 type="text"
                 id="campoCaja"
                 placeholder="Caja actual (opcional)"
                 maxlength="50">
+
+        </div>
+
+        <div class="fila-exportar">
+
+            <button id="btnExportar" class="btn-secundario">📄 Exportar</button>
+
+            <button id="btnEnviarCorreo" class="btn-secundario">📧 Enviar</button>
+
+            <button id="btnNueva" class="btn-secundario">🗑 Borrar inventario</button>
 
         </div>
 
@@ -329,6 +334,34 @@
 
             <button
                 id="btnCerrarCargaMaestro"
+                class="btn-secundario">
+
+                Cerrar
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ===================== -->
+<!-- PANTALLA: ELEGIR EMPRESA ACTIVA -->
+<!-- ===================== -->
+
+<div id="pantallaSeleccionarEmpresa" class="modal-overlay">
+
+    <div class="modal-box pantalla-grande">
+
+        <h3>Trabajar con...</h3>
+
+        <div id="listaSeleccionarEmpresa" class="lista-empresas"></div>
+
+        <div class="modal-acciones">
+
+            <button
+                id="btnCerrarSeleccionarEmpresa"
                 class="btn-secundario">
 
                 Cerrar
