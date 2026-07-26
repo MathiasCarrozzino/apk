@@ -3,7 +3,7 @@
 =========================== */
 
 :root{
-
+   font-weight: 900;
     --primario:#1565C0;
     --primario-light:#4C8DDB;
     --primario-dark:#0D47A1;
@@ -11,8 +11,8 @@
     --fondo:#eef1f5;
     --panel:#ffffff;
 
-    --texto:#1a1d23;
-    --texto-sec:#6b7280;
+    --texto:#000000;
+    --texto-sec:#000000;
 
     --borde:#dde2e8;
 
