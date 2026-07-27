@@ -350,7 +350,8 @@ function cargarMaestroExcel(evento) {
 
 
             estadoCarga.textContent =
-                "Error leyendo el archivo";
+                "Error leyendo el archivo: " +
+                (error && error.message ? error.message : String(error));
 
 
             mostrarMensaje(
@@ -654,6 +655,8 @@ function cambiarEmpresaActiva(nombre) {
     guardarEmpresas();
 
     actualizarEstadoMaestro();
+
+    actualizarSelectorEmpresaActiva();
 
     mostrarMensaje(
         `Trabajando con: ${empresaActiva}`,
