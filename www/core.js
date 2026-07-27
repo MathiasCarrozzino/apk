@@ -315,20 +315,19 @@ function cargarMaestroExcel(evento) {
                 listaMaestro;
 
 
-            // Si la empresa del archivo que acabamos de cargar es la
-            // que está activa, refrescamos el maestro que se usa
-            // para buscar al escanear
-            if (empresaElegida === empresaActiva) {
+            // El maestro que acabamos de cargar pasa a ser el activo:
+            // es lo que el usuario espera después de cargar un archivo
+            empresaActiva = empresaElegida;
 
-                maestro = listaMaestro;
-
-            }
+            maestro = listaMaestro;
 
 
             guardarEmpresas();
 
 
             actualizarEstadoMaestro();
+
+            actualizarSelectorEmpresaActiva();
 
 
             estadoCarga.textContent =
@@ -671,8 +670,6 @@ function actualizarSelectEmpresaCarga() {
     if (!select)
         return;
 
-    const valorPrevio = select.value;
-
     select.innerHTML =
         `<option value="">Elegí una empresa...</option>` +
         empresas.map(nombre =>
@@ -680,11 +677,9 @@ function actualizarSelectEmpresaCarga() {
         ).join("") +
         `<option value="__nueva__">➕ Nueva empresa...</option>`;
 
-    if (empresas.indexOf(valorPrevio) !== -1) {
-        select.value = valorPrevio;
-    } else if (empresaActiva) {
-        select.value = empresaActiva;
-    }
+    // Siempre arranca sin elegir, para evitar cargar un archivo
+    // sin querer bajo la empresa que quedó seleccionada la vez anterior
+    select.value = "";
 
 }
 
