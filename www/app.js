@@ -11,7 +11,7 @@ document.addEventListener(
 );
 
 
-function iniciarAplicacion() {
+async function iniciarAplicacion() {
 
     console.log(
         "Scanner Inventario iniciado"
@@ -32,7 +32,7 @@ function iniciarAplicacion() {
     // Cargar datos guardados
 
     if (typeof cargarMaestroLocal === "function")
-        cargarMaestroLocal();
+        await cargarMaestroLocal();
 
 
     if (typeof cargarInventarioLocal === "function")

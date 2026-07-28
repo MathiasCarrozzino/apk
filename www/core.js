@@ -191,7 +191,7 @@ function cargarMaestroExcel(evento) {
 
 
 
-    lector.onload = function(e) {
+    lector.onload = async function(e) {
 
 
         try {
@@ -322,7 +322,23 @@ function cargarMaestroExcel(evento) {
             maestro = listaMaestro;
 
 
-            guardarEmpresas();
+            estadoCarga.textContent =
+                "Guardando...";
+
+            const guardadoOk =
+                await guardarMaestroDeEmpresa(empresaElegida);
+
+            guardarListaEmpresas();
+
+
+            if (!guardadoOk) {
+
+                mostrarMensaje(
+                    "El maestro se cargó pero no se pudo guardar en el dispositivo",
+                    "error"
+                );
+
+            }
 
 
             actualizarEstadoMaestro();
@@ -652,7 +668,7 @@ function cambiarEmpresaActiva(nombre) {
 
     maestro = maestrosEmpresa[empresaActiva] || [];
 
-    guardarEmpresas();
+    guardarListaEmpresas();
 
     actualizarEstadoMaestro();
 
@@ -720,7 +736,9 @@ async function manejarSelectEmpresaCarga() {
         if (!empresaActiva)
             empresaActiva = nombreFinal;
 
-        guardarEmpresas();
+        guardarListaEmpresas();
+
+        await guardarMaestroDeEmpresa(nombreFinal);
 
         actualizarSelectorEmpresaActiva();
 
@@ -832,7 +850,7 @@ function cerrarPantallaEmpresas() {
 
 }
 
-function agregarEmpresaDesdeInput() {
+async function agregarEmpresaDesdeInput() {
 
     const input =
         document.getElementById("inputNuevaEmpresa");
@@ -868,7 +886,9 @@ function agregarEmpresaDesdeInput() {
 
     }
 
-    guardarEmpresas();
+    guardarListaEmpresas();
+
+    await guardarMaestroDeEmpresa(nombre);
 
     actualizarSelectorEmpresaActiva();
 
@@ -925,7 +945,11 @@ async function renombrarEmpresa(nombreViejo) {
         empresaActiva = nombreFinal;
     }
 
-    guardarEmpresas();
+    guardarListaEmpresas();
+
+    await guardarMaestroDeEmpresa(nombreFinal);
+
+    await eliminarMaestroDeEmpresa(nombreViejo);
 
     actualizarSelectorEmpresaActiva();
 
@@ -967,7 +991,9 @@ async function eliminarEmpresa(nombre) {
 
     }
 
-    guardarEmpresas();
+    guardarListaEmpresas();
+
+    await eliminarMaestroDeEmpresa(nombre);
 
     actualizarSelectorEmpresaActiva();
 

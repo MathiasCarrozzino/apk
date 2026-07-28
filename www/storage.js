@@ -59,21 +59,13 @@ function cargarInventarioLocal() {
 // MAESTRO
 // ==========================================
 
-function guardarEmpresas() {
+function guardarListaEmpresas() {
 
     localStorage.setItem(
 
         STORAGE.EMPRESAS,
 
         JSON.stringify(empresas)
-
-    );
-
-    localStorage.setItem(
-
-        STORAGE.MAESTROS_EMPRESA,
-
-        JSON.stringify(maestrosEmpresa)
 
     );
 
@@ -87,55 +79,191 @@ function guardarEmpresas() {
 
 }
 
-function cargarMaestroLocal() {
+function esNativoCapacitor() {
 
-    const datosEmpresas = localStorage.getItem(
-
-        STORAGE.EMPRESAS
-
+    return !!(
+        window.Capacitor &&
+        typeof window.Capacitor.isNativePlatform === "function" &&
+        window.Capacitor.isNativePlatform() &&
+        window.Capacitor.Plugins &&
+        window.Capacitor.Plugins.Filesystem
     );
 
-    const datosMaestros = localStorage.getItem(
+}
 
-        STORAGE.MAESTROS_EMPRESA
+function rutaMaestro(nombreEmpresa) {
 
-    );
+    return `maestros/${encodeURIComponent(nombreEmpresa)}.json`;
+
+}
+
+async function guardarMaestroDeEmpresa(nombreEmpresa) {
+
+    const contenido =
+        JSON.stringify(maestrosEmpresa[nombreEmpresa] || []);
+
+    if (esNativoCapacitor()) {
+
+        try {
+
+            await window.Capacitor.Plugins.Filesystem.writeFile({
+                path: rutaMaestro(nombreEmpresa),
+                data: contenido,
+                directory: "DATA",
+                encoding: "utf8",
+                recursive: true
+            });
+
+            return true;
+
+        } catch (error) {
+
+            console.error("No se pudo guardar el maestro en archivo:", error);
+
+            return false;
+
+        }
+
+    }
+
+    // Respaldo para pruebas fuera de la APK (navegador de escritorio)
+    try {
+
+        localStorage.setItem("maestro_" + nombreEmpresa, contenido);
+
+        return true;
+
+    } catch (error) {
+
+        console.error("No se pudo guardar el maestro (localStorage):", error);
+
+        return false;
+
+    }
+
+}
+
+async function cargarMaestroDeEmpresa(nombreEmpresa) {
+
+    if (esNativoCapacitor()) {
+
+        try {
+
+            const resultado =
+                await window.Capacitor.Plugins.Filesystem.readFile({
+                    path: rutaMaestro(nombreEmpresa),
+                    directory: "DATA",
+                    encoding: "utf8"
+                });
+
+            return JSON.parse(resultado.data);
+
+        } catch (error) {
+
+            // Puede no existir todavía (empresa recién creada, sin maestro)
+            return [];
+
+        }
+
+    }
+
+    const datos = localStorage.getItem("maestro_" + nombreEmpresa);
+
+    return datos ? JSON.parse(datos) : [];
+
+}
+
+async function eliminarMaestroDeEmpresa(nombreEmpresa) {
+
+    if (esNativoCapacitor()) {
+
+        try {
+
+            await window.Capacitor.Plugins.Filesystem.deleteFile({
+                path: rutaMaestro(nombreEmpresa),
+                directory: "DATA"
+            });
+
+        } catch (error) {}
+
+        return;
+
+    }
+
+    localStorage.removeItem("maestro_" + nombreEmpresa);
+
+}
+
+async function cargarMaestroLocal() {
+
+    const datosEmpresas =
+        localStorage.getItem(STORAGE.EMPRESAS);
 
     empresas = datosEmpresas
-
         ? JSON.parse(datosEmpresas)
-
         : [];
 
-    maestrosEmpresa = datosMaestros
-
-        ? JSON.parse(datosMaestros)
-
-        : {};
-
-    // Migración: si venías de la versión anterior (un solo maestro,
-    // sin empresas), se convierte en la primera empresa
+    // Migración desde versiones anteriores
     if (empresas.length === 0) {
 
-        const maestroViejo = localStorage.getItem(STORAGE.MAESTRO);
+        const maestrosEmpresaViejo =
+            localStorage.getItem(STORAGE.MAESTROS_EMPRESA);
 
-        if (maestroViejo) {
+        if (maestrosEmpresaViejo) {
+
+            // Venías de la versión que guardaba todos los maestros
+            // juntos en localStorage (la que se quedaba sin espacio)
 
             try {
 
-                const listaVieja = JSON.parse(maestroViejo);
+                const datosViejos = JSON.parse(maestrosEmpresaViejo);
 
-                if (Array.isArray(listaVieja) && listaVieja.length > 0) {
+                for (const nombre of Object.keys(datosViejos)) {
 
-                    empresas.push("Empresa 1");
+                    empresas.push(nombre);
 
-                    maestrosEmpresa["Empresa 1"] = listaVieja;
+                    maestrosEmpresa[nombre] = datosViejos[nombre];
+
+                    await guardarMaestroDeEmpresa(nombre);
 
                 }
 
-            } catch (error) {}
+            } catch (error) {
+
+                console.error("Error migrando maestros:", error);
+
+            }
+
+            localStorage.removeItem(STORAGE.MAESTROS_EMPRESA);
+
+        } else {
+
+            // Versión aún más vieja: un solo maestro, sin empresas
+            const maestroViejo = localStorage.getItem(STORAGE.MAESTRO);
+
+            if (maestroViejo) {
+
+                try {
+
+                    const listaVieja = JSON.parse(maestroViejo);
+
+                    if (Array.isArray(listaVieja) && listaVieja.length > 0) {
+
+                        empresas.push("Empresa 1");
+
+                        maestrosEmpresa["Empresa 1"] = listaVieja;
+
+                        await guardarMaestroDeEmpresa("Empresa 1");
+
+                    }
+
+                } catch (error) {}
+
+            }
 
         }
+
+        guardarListaEmpresas();
 
     }
 
@@ -143,6 +271,15 @@ function cargarMaestroLocal() {
 
     if (!empresaActiva || empresas.indexOf(empresaActiva) === -1) {
         empresaActiva = empresas[0] || "";
+    }
+
+    // Cargamos el maestro de cada empresa desde su archivo
+    for (const nombre of empresas) {
+
+        if (!maestrosEmpresa[nombre]) {
+            maestrosEmpresa[nombre] = await cargarMaestroDeEmpresa(nombre);
+        }
+
     }
 
     maestro = maestrosEmpresa[empresaActiva] || [];
@@ -301,15 +438,17 @@ function limpiarInventario() {
 
 }
 
-function limpiarMaestro() {
+async function limpiarMaestro() {
 
     if (empresaActiva) {
+
         maestrosEmpresa[empresaActiva] = [];
+
+        await guardarMaestroDeEmpresa(empresaActiva);
+
     }
 
     maestro = [];
-
-    guardarEmpresas();
 
 }
 
