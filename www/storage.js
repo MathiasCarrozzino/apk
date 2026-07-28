@@ -109,7 +109,7 @@ async function guardarMaestroDeEmpresa(nombreEmpresa) {
             await window.Capacitor.Plugins.Filesystem.writeFile({
                 path: rutaMaestro(nombreEmpresa),
                 data: contenido,
-                directory: "DATA",
+                directory: "CACHE",
                 encoding: "utf8",
                 recursive: true
             });
@@ -152,7 +152,7 @@ async function cargarMaestroDeEmpresa(nombreEmpresa) {
             const resultado =
                 await window.Capacitor.Plugins.Filesystem.readFile({
                     path: rutaMaestro(nombreEmpresa),
-                    directory: "DATA",
+                    directory: "CACHE",
                     encoding: "utf8"
                 });
 
@@ -181,7 +181,7 @@ async function eliminarMaestroDeEmpresa(nombreEmpresa) {
 
             await window.Capacitor.Plugins.Filesystem.deleteFile({
                 path: rutaMaestro(nombreEmpresa),
-                directory: "DATA"
+                directory: "CACHE"
             });
 
         } catch (error) {}
