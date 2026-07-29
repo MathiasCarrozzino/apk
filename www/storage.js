@@ -93,7 +93,7 @@ function esNativoCapacitor() {
 
 function rutaMaestro(nombreEmpresa) {
 
-    return `maestros/${encodeURIComponent(nombreEmpresa)}.json`;
+    return `maestro_empresa_${encodeURIComponent(nombreEmpresa)}.json`;
 
 }
 
@@ -110,8 +110,7 @@ async function guardarMaestroDeEmpresa(nombreEmpresa) {
                 path: rutaMaestro(nombreEmpresa),
                 data: contenido,
                 directory: "CACHE",
-                encoding: "utf8",
-                recursive: true
+                encoding: "utf8"
             });
 
             return true;
