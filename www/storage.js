@@ -97,6 +97,34 @@ function rutaMaestro(nombreEmpresa) {
 
 }
 
+function textoABase64(texto) {
+
+    const bytes = new TextEncoder().encode(texto);
+
+    let binario = "";
+
+    for (let i = 0; i < bytes.byteLength; i++) {
+        binario += String.fromCharCode(bytes[i]);
+    }
+
+    return btoa(binario);
+
+}
+
+function base64ATexto(base64) {
+
+    const binario = atob(base64);
+
+    const bytes = new Uint8Array(binario.length);
+
+    for (let i = 0; i < binario.length; i++) {
+        bytes[i] = binario.charCodeAt(i);
+    }
+
+    return new TextDecoder("utf-8").decode(bytes);
+
+}
+
 async function guardarMaestroDeEmpresa(nombreEmpresa) {
 
     const contenido =
@@ -108,9 +136,8 @@ async function guardarMaestroDeEmpresa(nombreEmpresa) {
 
             await window.Capacitor.Plugins.Filesystem.writeFile({
                 path: rutaMaestro(nombreEmpresa),
-                data: contenido,
-                directory: "CACHE",
-                encoding: "utf8"
+                data: textoABase64(contenido),
+                directory: "CACHE"
             });
 
             return true;
@@ -151,11 +178,10 @@ async function cargarMaestroDeEmpresa(nombreEmpresa) {
             const resultado =
                 await window.Capacitor.Plugins.Filesystem.readFile({
                     path: rutaMaestro(nombreEmpresa),
-                    directory: "CACHE",
-                    encoding: "utf8"
+                    directory: "CACHE"
                 });
 
-            return JSON.parse(resultado.data);
+            return JSON.parse(base64ATexto(resultado.data));
 
         } catch (error) {
 
