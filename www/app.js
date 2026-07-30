@@ -191,6 +191,13 @@ function registrarEventos() {
     );
 
 
+    agregarEvento(
+        "observacion",
+        "keydown",
+        eventoObservacion
+    );
+
+
     // MODAL DE EDICIÓN
 
     agregarEvento(

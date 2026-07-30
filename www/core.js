@@ -756,6 +756,46 @@ function eventoCantidad(e) {
 
 }
 
+function eventoObservacion(e) {
+
+
+    const esEnter =
+        e.key === "Enter" ||
+        e.keyCode === 13 ||
+        e.which === 13;
+
+
+    if (esEnter) {
+
+
+        e.preventDefault();
+
+
+
+        agregarArticulo();
+
+
+
+        setTimeout(
+            () => {
+
+
+                document
+                .getElementById(
+                    "codigo"
+                )
+                .focus();
+
+
+            },
+            100
+        );
+
+
+    }
+
+}
+
 
 
 // ==========================================
