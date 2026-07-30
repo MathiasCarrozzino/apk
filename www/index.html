@@ -34,10 +34,6 @@
 
     <div class="topbar-acciones">
 
-        <button id="btnEmpresas" aria-label="Gestionar empresas" title="Gestionar empresas">
-            🛠️
-        </button>
-
         <button id="btnTema" aria-label="Cambiar tema">
             🌙
         </button>
@@ -52,13 +48,13 @@
 
 <section class="maestro-bar">
 
-    <button id="btnAbrirCargaMaestro" class="maestro-file-btn">
+    <label class="maestro-file">
         📁 <span id="estado">Sin maestro cargado</span>
-    </button>
-
-    <button id="btnEmpresaActiva" class="maestro-file-btn">
-        <span id="nombreEmpresaActivaTexto">Sin empresa</span> ⬇︎
-    </button>
+        <input
+            type="file"
+            id="archivoMaestro"
+            accept=".xlsx,.xls,.csv">
+    </label>
 
     <label class="switch-compact">
         <input
@@ -132,7 +128,7 @@
 
             <button id="btnEnviarCorreo" class="btn-secundario">📧 Enviar</button>
 
-            <button id="btnNueva" class="btn-secundario">🗑 Borrar</button>
+            <button id="btnNueva" class="btn-secundario">🗑 Borrar inventario</button>
 
         </div>
 
@@ -289,122 +285,6 @@
             <button id="modalConfirmarAceptar">
 
                 Confirmar
-
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-<!-- ===================== -->
-<!-- PANTALLA: CARGAR MAESTRO -->
-<!-- ===================== -->
-
-<div id="pantallaCargarMaestro" class="modal-overlay">
-
-    <div class="modal-box pantalla-grande">
-
-        <h3>Cargar maestro</h3>
-
-        <label class="campo-label">Empresa a la que pertenece</label>
-
-        <select id="selectEmpresaCarga">
-
-            <option value="">Elegí una empresa...</option>
-            <option value="__nueva__">➕ Nueva empresa...</option>
-
-        </select>
-
-        <label class="maestro-file campo-archivo">
-
-            📁 Elegir archivo (.xlsx, .xls, .csv)
-
-            <input
-                type="file"
-                id="archivoMaestro"
-                accept=".xlsx,.xls,.csv">
-
-        </label>
-
-        <p id="estadoCargaMaestro" class="texto-ayuda"></p>
-
-        <div class="modal-acciones">
-
-            <button
-                id="btnCerrarCargaMaestro"
-                class="btn-secundario">
-
-                Cerrar
-
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-<!-- ===================== -->
-<!-- PANTALLA: ELEGIR EMPRESA ACTIVA -->
-<!-- ===================== -->
-
-<div id="pantallaSeleccionarEmpresa" class="modal-overlay">
-
-    <div class="modal-box pantalla-grande">
-
-        <h3>Trabajar con...</h3>
-
-        <div id="listaSeleccionarEmpresa" class="lista-empresas"></div>
-
-        <div class="modal-acciones">
-
-            <button
-                id="btnCerrarSeleccionarEmpresa"
-                class="btn-secundario">
-
-                Cerrar
-
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-<!-- ===================== -->
-<!-- PANTALLA: EMPRESAS -->
-<!-- ===================== -->
-
-<div id="pantallaEmpresas" class="modal-overlay">
-
-    <div class="modal-box pantalla-grande">
-
-        <h3>Empresas</h3>
-
-        <div id="listaEmpresas" class="lista-empresas"></div>
-
-        <div class="agregar-empresa-fila">
-
-            <input
-                type="text"
-                id="inputNuevaEmpresa"
-                placeholder="Nombre de nueva empresa"
-                maxlength="60">
-
-            <button id="btnAgregarEmpresa">➕</button>
-
-        </div>
-
-        <div class="modal-acciones">
-
-            <button
-                id="btnCerrarPantallaEmpresas"
-                class="btn-secundario">
-
-                Cerrar
 
             </button>
 

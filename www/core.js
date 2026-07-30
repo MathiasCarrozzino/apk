@@ -18,12 +18,6 @@ let lista = [];
 
 let maestro = [];
 
-let empresas = [];
-
-let maestrosEmpresa = {};
-
-let empresaActiva = "";
-
 function sonMismoArticulo(a, b) {
 
     return (
@@ -134,221 +128,99 @@ function cargarMaestroExcel(evento) {
         return;
 
 
-
-    const selectEmpresa =
-        document.getElementById(
-            "selectEmpresaCarga"
-        );
-
-    const empresaElegida =
-        selectEmpresa.value;
-
-    const estadoCarga =
-        document.getElementById(
-            "estadoCargaMaestro"
-        );
+    const estado =
+        document.getElementById("estado");
 
 
-    if (!empresaElegida) {
-
-        estadoCarga.textContent =
-            "Elegí primero a qué empresa pertenece este maestro.";
-
-        evento.target.value = "";
-
-        return;
-
-    }
-
-
-
-    estadoCarga.textContent =
+    estado.textContent =
         "Leyendo archivo...";
-
 
 
     if (typeof XLSX === "undefined") {
 
-
-        estadoCarga.textContent =
+        estado.textContent =
             "Error: la librería Excel no está disponible";
-
 
         mostrarMensaje(
             "La librería Excel no está disponible",
             "error"
         );
 
-
         return;
 
     }
-
 
 
     const lector =
         new FileReader();
 
 
-
-    lector.onload = async function(e) {
-
+    lector.onload = function(e) {
 
         try {
 
-
             const datos =
-                new Uint8Array(
-                    e.target.result
-                );
-
+                new Uint8Array(e.target.result);
 
             const libro =
-                XLSX.read(
-                    datos,
-                    {
-                        type:"array"
-                    }
-                );
-
+                XLSX.read(datos, { type: "array" });
 
             const hoja =
-                libro.Sheets[
-                    libro.SheetNames[0]
-                ];
-
+                libro.Sheets[libro.SheetNames[0]];
 
 
             const filas =
-                XLSX.utils.sheet_to_json(
-                    hoja,
-                    {
-                        defval:""
-                    }
-                );
-
+                XLSX.utils.sheet_to_json(hoja, { defval: "" });
 
 
             let listaMaestro =
                 filas
                 .map(normalizarFilaMaestro)
-                .filter(
-                    item =>
-                    item.ean ||
-                    item.interno
-                );
-
+                .filter(item => item.ean || item.interno);
 
 
             if (listaMaestro.length === 0) {
 
-
                 const filasCrudas =
-                    XLSX.utils.sheet_to_json(
-                        hoja,
-                        {
-                            header:1,
-                            defval:""
-                        }
-                    );
-
+                    XLSX.utils.sheet_to_json(hoja, { header: 1, defval: "" });
 
                 listaMaestro =
                     filasCrudas
-                    .filter(
-                        fila =>
-                        fila.some(
-                            celda =>
-                            celda !== ""
-                        )
-                    )
-                    .map(
-                        fila => ({
+                    .filter(fila => fila.some(celda => celda !== ""))
+                    .map(fila => ({
 
-                            ean:
-                            limpiarCodigo(
-                                fila[0]
-                            ),
+                        ean: limpiarCodigo(fila[0]),
+                        interno: limpiarCodigo(fila[1]),
+                        descripcion: String(fila[2] ?? "").trim()
 
-                            interno:
-                            limpiarCodigo(
-                                fila[1]
-                            ),
-
-                            descripcion:
-                            String(
-                                fila[2] ?? ""
-                            ).trim()
-
-                        })
-                    )
-                    .filter(
-                        item =>
-                        item.ean ||
-                        item.interno
-                    );
+                    }))
+                    .filter(item => item.ean || item.interno);
 
             }
 
 
-
             if (listaMaestro.length === 0) {
 
-
-                estadoCarga.textContent =
+                estado.textContent =
                     "No se encontraron artículos en el archivo";
-
 
                 mostrarMensaje(
                     "No se encontraron datos",
                     "error"
                 );
 
-
                 return;
 
             }
 
 
-
-            maestrosEmpresa[empresaElegida] =
-                listaMaestro;
-
-
-            // El maestro que acabamos de cargar pasa a ser el activo:
-            // es lo que el usuario espera después de cargar un archivo
-            empresaActiva = empresaElegida;
-
             maestro = listaMaestro;
 
-
-            estadoCarga.textContent =
-                "Guardando...";
-
-            const guardadoOk =
-                await guardarMaestroDeEmpresa(empresaElegida);
-
-            guardarListaEmpresas();
+            guardarMaestro();
 
 
-            if (!guardadoOk) {
-
-                mostrarMensaje(
-                    "El maestro se cargó pero no se pudo guardar en el dispositivo",
-                    "error"
-                );
-
-            }
-
-
-            actualizarEstadoMaestro();
-
-            actualizarSelectorEmpresaActiva();
-
-
-            estadoCarga.textContent =
-                `Listo: ${listaMaestro.length} artículos cargados para "${empresaElegida}".`;
-
+            estado.textContent =
+                `Maestro cargado (${maestro.length} artículos)`;
 
             mostrarMensaje(
                 "Maestro cargado correctamente",
@@ -356,19 +228,13 @@ function cargarMaestroExcel(evento) {
             );
 
 
-
         } catch(error) {
 
+            console.error(error);
 
-            console.error(
-                error
-            );
-
-
-            estadoCarga.textContent =
+            estado.textContent =
                 "Error leyendo el archivo: " +
                 (error && error.message ? error.message : String(error));
-
 
             mostrarMensaje(
                 "Error leyendo maestro",
@@ -377,29 +243,23 @@ function cargarMaestroExcel(evento) {
 
         }
 
-
     };
-
 
 
     lector.onerror = function() {
 
-        estadoCarga.textContent =
+        estado.textContent =
             "No se pudo leer el archivo";
 
     };
 
 
-
-    lector.readAsArrayBuffer(
-        archivo
-    );
+    lector.readAsArrayBuffer(archivo);
 
 
     evento.target.value = "";
 
 }
-
 
 
 
@@ -539,469 +399,6 @@ function buscarEnMaestro(codigo) {
 
 
     });
-
-}
-
-
-
-// ==========================================
-// EMPRESAS Y MAESTROS POR EMPRESA
-// ==========================================
-
-function actualizarEstadoMaestro() {
-
-    const estado =
-        document.getElementById("estado");
-
-    if (!estado)
-        return;
-
-    if (!empresaActiva) {
-
-        estado.textContent = "Sin empresa activa";
-
-        return;
-
-    }
-
-    const cantidad =
-        (maestrosEmpresa[empresaActiva] || []).length;
-
-    estado.textContent =
-        cantidad > 0
-        ? `${empresaActiva}: ${cantidad} artículos`
-        : `${empresaActiva}: sin maestro cargado`;
-
-}
-
-function actualizarSelectorEmpresaActiva() {
-
-    const texto =
-        document.getElementById("nombreEmpresaActivaTexto");
-
-    if (texto) {
-
-        texto.textContent =
-            empresaActiva || "Sin empresa";
-
-    }
-
-    // Si la pantalla del selector está abierta en este momento,
-    // refrescamos también su lista
-    const pantalla =
-        document.getElementById("pantallaSeleccionarEmpresa");
-
-    if (pantalla && pantalla.classList.contains("abierto")) {
-        dibujarListaSeleccionarEmpresa();
-    }
-
-}
-
-function dibujarListaSeleccionarEmpresa() {
-
-    const contenedor =
-        document.getElementById("listaSeleccionarEmpresa");
-
-    if (!contenedor)
-        return;
-
-    if (empresas.length === 0) {
-
-        contenedor.innerHTML =
-            `<p class="lista-empresas-vacio">Todavía no creaste ninguna empresa.</p>`;
-
-        return;
-
-    }
-
-    contenedor.innerHTML = "";
-
-    empresas.forEach(nombre => {
-
-        const fila = document.createElement("div");
-        fila.className = "fila-empresa fila-empresa-clickeable";
-
-        const activa = nombre === empresaActiva;
-
-        fila.innerHTML = `
-
-            <span class="fila-empresa-nombre ${activa ? "activa" : ""}">
-                ${nombre}${activa ? " ✓" : ""}
-            </span>
-
-        `;
-
-        fila.onclick = () => {
-
-            cambiarEmpresaActiva(nombre);
-
-            cerrarSelectorEmpresaActiva();
-
-        };
-
-        contenedor.appendChild(fila);
-
-    });
-
-}
-
-function abrirSelectorEmpresaActiva() {
-
-    dibujarListaSeleccionarEmpresa();
-
-    document.getElementById("pantallaSeleccionarEmpresa").classList.add("abierto");
-
-}
-
-function cerrarSelectorEmpresaActiva() {
-
-    document.getElementById("pantallaSeleccionarEmpresa").classList.remove("abierto");
-
-}
-
-function cambiarEmpresaActiva(nombre) {
-
-    if (!nombre || empresas.indexOf(nombre) === -1)
-        return;
-
-    empresaActiva = nombre;
-
-    maestro = maestrosEmpresa[empresaActiva] || [];
-
-    guardarListaEmpresas();
-
-    actualizarEstadoMaestro();
-
-    actualizarSelectorEmpresaActiva();
-
-    mostrarMensaje(
-        `Trabajando con: ${empresaActiva}`,
-        "exito"
-    );
-
-}
-
-function actualizarSelectEmpresaCarga() {
-
-    const select =
-        document.getElementById("selectEmpresaCarga");
-
-    if (!select)
-        return;
-
-    select.innerHTML =
-        `<option value="">Elegí una empresa...</option>` +
-        empresas.map(nombre =>
-            `<option value="${nombre}">${nombre}</option>`
-        ).join("") +
-        `<option value="__nueva__">➕ Nueva empresa...</option>`;
-
-    // Siempre arranca sin elegir, para evitar cargar un archivo
-    // sin querer bajo la empresa que quedó seleccionada la vez anterior
-    select.value = "";
-
-}
-
-async function manejarSelectEmpresaCarga() {
-
-    const select =
-        document.getElementById("selectEmpresaCarga");
-
-    if (select.value !== "__nueva__")
-        return;
-
-    const nombre =
-        await pedirTextoModal(
-            "Nombre de la nueva empresa",
-            "",
-            "text"
-        );
-
-    if (nombre === null || !nombre.trim()) {
-
-        actualizarSelectEmpresaCarga();
-
-        return;
-
-    }
-
-    const nombreFinal = nombre.trim();
-
-    if (empresas.indexOf(nombreFinal) === -1) {
-
-        empresas.push(nombreFinal);
-
-        maestrosEmpresa[nombreFinal] = [];
-
-        if (!empresaActiva)
-            empresaActiva = nombreFinal;
-
-        guardarListaEmpresas();
-
-        await guardarMaestroDeEmpresa(nombreFinal);
-
-        actualizarSelectorEmpresaActiva();
-
-    }
-
-    actualizarSelectEmpresaCarga();
-
-    select.value = nombreFinal;
-
-}
-
-function abrirPantallaCargarMaestro() {
-
-    actualizarSelectEmpresaCarga();
-
-    document.getElementById("estadoCargaMaestro").textContent = "";
-
-    document.getElementById("pantallaCargarMaestro").classList.add("abierto");
-
-}
-
-function cerrarPantallaCargarMaestro() {
-
-    document.getElementById("pantallaCargarMaestro").classList.remove("abierto");
-
-}
-
-function dibujarListaEmpresas() {
-
-    const contenedor =
-        document.getElementById("listaEmpresas");
-
-    if (!contenedor)
-        return;
-
-    if (empresas.length === 0) {
-
-        contenedor.innerHTML =
-            `<p class="lista-empresas-vacio">Todavía no creaste ninguna empresa.</p>`;
-
-        return;
-
-    }
-
-    contenedor.innerHTML = "";
-
-    empresas.forEach(nombre => {
-
-        const fila = document.createElement("div");
-        fila.className = "fila-empresa";
-
-        const activa = nombre === empresaActiva;
-
-        fila.innerHTML = `
-
-            <span class="fila-empresa-nombre ${activa ? "activa" : ""}">
-                ${nombre}${activa ? " ✓" : ""}
-            </span>
-
-            <span class="fila-empresa-acciones">
-
-                <button class="btnEditarCampo btn-renombrar-empresa" data-nombre="${nombre}" title="Renombrar">
-                    ✏️
-                </button>
-
-                <button class="btnEliminar btn-eliminar-empresa" data-nombre="${nombre}" title="Eliminar">
-                    🗑
-                </button>
-
-            </span>
-
-        `;
-
-        contenedor.appendChild(fila);
-
-    });
-
-    contenedor.querySelectorAll(".btn-renombrar-empresa")
-        .forEach(boton => {
-
-            boton.onclick = () =>
-                renombrarEmpresa(boton.dataset.nombre);
-
-        });
-
-    contenedor.querySelectorAll(".btn-eliminar-empresa")
-        .forEach(boton => {
-
-            boton.onclick = () =>
-                eliminarEmpresa(boton.dataset.nombre);
-
-        });
-
-}
-
-function abrirPantallaEmpresas() {
-
-    dibujarListaEmpresas();
-
-    document.getElementById("inputNuevaEmpresa").value = "";
-
-    document.getElementById("pantallaEmpresas").classList.add("abierto");
-
-}
-
-function cerrarPantallaEmpresas() {
-
-    document.getElementById("pantallaEmpresas").classList.remove("abierto");
-
-}
-
-async function agregarEmpresaDesdeInput() {
-
-    const input =
-        document.getElementById("inputNuevaEmpresa");
-
-    const nombre =
-        input.value.trim();
-
-    if (!nombre) {
-
-        mostrarMensaje("Escribí un nombre de empresa", "error");
-
-        return;
-
-    }
-
-    if (empresas.indexOf(nombre) !== -1) {
-
-        mostrarMensaje("Ya existe una empresa con ese nombre", "error");
-
-        return;
-
-    }
-
-    empresas.push(nombre);
-
-    maestrosEmpresa[nombre] = [];
-
-    if (!empresaActiva) {
-
-        empresaActiva = nombre;
-
-        maestro = maestrosEmpresa[empresaActiva];
-
-    }
-
-    guardarListaEmpresas();
-
-    await guardarMaestroDeEmpresa(nombre);
-
-    actualizarSelectorEmpresaActiva();
-
-    actualizarEstadoMaestro();
-
-    dibujarListaEmpresas();
-
-    input.value = "";
-
-    mostrarMensaje("Empresa agregada", "exito");
-
-}
-
-async function renombrarEmpresa(nombreViejo) {
-
-    const nombreNuevo =
-        await pedirTextoModal(
-            "Nombre de la empresa",
-            nombreViejo,
-            "text"
-        );
-
-    if (nombreNuevo === null)
-        return;
-
-    const nombreFinal =
-        nombreNuevo.trim();
-
-    if (!nombreFinal || nombreFinal === nombreViejo)
-        return;
-
-    if (empresas.indexOf(nombreFinal) !== -1) {
-
-        mostrarMensaje("Ya existe una empresa con ese nombre", "error");
-
-        return;
-
-    }
-
-    const indice =
-        empresas.indexOf(nombreViejo);
-
-    if (indice === -1)
-        return;
-
-    empresas[indice] = nombreFinal;
-
-    maestrosEmpresa[nombreFinal] =
-        maestrosEmpresa[nombreViejo] || [];
-
-    delete maestrosEmpresa[nombreViejo];
-
-    if (empresaActiva === nombreViejo) {
-        empresaActiva = nombreFinal;
-    }
-
-    guardarListaEmpresas();
-
-    await guardarMaestroDeEmpresa(nombreFinal);
-
-    await eliminarMaestroDeEmpresa(nombreViejo);
-
-    actualizarSelectorEmpresaActiva();
-
-    actualizarEstadoMaestro();
-
-    dibujarListaEmpresas();
-
-    mostrarMensaje("Empresa renombrada", "exito");
-
-}
-
-async function eliminarEmpresa(nombre) {
-
-    const confirmado =
-        await pedirConfirmacion(
-            "Eliminar empresa",
-            `¿Seguro que querés eliminar "${nombre}"? También se borra el maestro que tenga cargado (el inventario ya ingresado no se toca).`,
-            "Eliminar"
-        );
-
-    if (!confirmado)
-        return;
-
-    const indice =
-        empresas.indexOf(nombre);
-
-    if (indice === -1)
-        return;
-
-    empresas.splice(indice, 1);
-
-    delete maestrosEmpresa[nombre];
-
-    if (empresaActiva === nombre) {
-
-        empresaActiva = empresas[0] || "";
-
-        maestro = maestrosEmpresa[empresaActiva] || [];
-
-    }
-
-    guardarListaEmpresas();
-
-    await eliminarMaestroDeEmpresa(nombre);
-
-    actualizarSelectorEmpresaActiva();
-
-    actualizarEstadoMaestro();
-
-    dibujarListaEmpresas();
-
-    mostrarMensaje("Empresa eliminada", "exito");
 
 }
 

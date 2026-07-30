@@ -32,7 +32,7 @@ async function iniciarAplicacion() {
     // Cargar datos guardados
 
     if (typeof cargarMaestroLocal === "function")
-        await cargarMaestroLocal();
+        cargarMaestroLocal();
 
 
     if (typeof cargarInventarioLocal === "function")
@@ -141,118 +141,6 @@ function registrarEventos() {
         "change",
         cargarMaestroExcel
     );
-
-
-    agregarEvento(
-        "btnAbrirCargaMaestro",
-        "click",
-        abrirPantallaCargarMaestro
-    );
-
-
-    agregarEvento(
-        "btnCerrarCargaMaestro",
-        "click",
-        cerrarPantallaCargarMaestro
-    );
-
-
-    agregarEvento(
-        "selectEmpresaCarga",
-        "change",
-        manejarSelectEmpresaCarga
-    );
-
-
-    agregarEvento(
-        "btnEmpresaActiva",
-        "click",
-        abrirSelectorEmpresaActiva
-    );
-
-
-    agregarEvento(
-        "btnCerrarSeleccionarEmpresa",
-        "click",
-        cerrarSelectorEmpresaActiva
-    );
-
-
-    agregarEvento(
-        "btnEmpresas",
-        "click",
-        abrirPantallaEmpresas
-    );
-
-
-    agregarEvento(
-        "btnCerrarPantallaEmpresas",
-        "click",
-        cerrarPantallaEmpresas
-    );
-
-
-    agregarEvento(
-        "btnAgregarEmpresa",
-        "click",
-        agregarEmpresaDesdeInput
-    );
-
-
-    agregarEvento(
-        "inputNuevaEmpresa",
-        "keydown",
-        (evento) => {
-
-            if (evento.key === "Enter") {
-                evento.preventDefault();
-                agregarEmpresaDesdeInput();
-            }
-
-        }
-    );
-
-
-    const overlayCargaMaestro = document.getElementById("pantallaCargarMaestro");
-
-    if (overlayCargaMaestro) {
-
-        overlayCargaMaestro.addEventListener("click", (evento) => {
-
-            if (evento.target === overlayCargaMaestro)
-                cerrarPantallaCargarMaestro();
-
-        });
-
-    }
-
-
-    const overlayEmpresas = document.getElementById("pantallaEmpresas");
-
-    if (overlayEmpresas) {
-
-        overlayEmpresas.addEventListener("click", (evento) => {
-
-            if (evento.target === overlayEmpresas)
-                cerrarPantallaEmpresas();
-
-        });
-
-    }
-
-
-    const overlaySeleccionarEmpresa = document.getElementById("pantallaSeleccionarEmpresa");
-
-    if (overlaySeleccionarEmpresa) {
-
-        overlaySeleccionarEmpresa.addEventListener("click", (evento) => {
-
-            if (evento.target === overlaySeleccionarEmpresa)
-                cerrarSelectorEmpresaActiva();
-
-        });
-
-    }
 
 
     agregarEvento(

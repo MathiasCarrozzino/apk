@@ -3,7 +3,7 @@
 =========================== */
 
 :root{
-   font-weight: 900;
+
     --primario:#1565C0;
     --primario-light:#4C8DDB;
     --primario-dark:#0D47A1;
@@ -11,8 +11,8 @@
     --fondo:#eef1f5;
     --panel:#ffffff;
 
-    --texto:#000000;
-    --texto-sec:#000000;
+    --texto:#1a1d23;
+    --texto-sec:#6b7280;
 
     --borde:#dde2e8;
 
@@ -125,8 +125,7 @@ HEADER
 
 }
 
-#btnTema,
-#btnEmpresas{
+#btnTema{
 
     width:36px;
 
@@ -148,8 +147,7 @@ HEADER
 
 }
 
-#btnTema:hover,
-#btnEmpresas:hover{
+#btnTema:hover{
 
     background:rgba(255,255,255,.28);
 
@@ -311,62 +309,6 @@ poco protagonismo)
     cursor:pointer;
 
     width:100%;
-
-}
-
-.maestro-file-btn{
-
-    background:transparent;
-
-    color:var(--texto-sec);
-
-    border:none;
-
-    padding:4px 0;
-
-    font-size:12.5px;
-
-    font-weight:400;
-
-    display:flex;
-
-    align-items:center;
-
-    gap:6px;
-
-    flex:1;
-
-    min-width:0;
-
-    text-align:left;
-
-    justify-content:flex-start;
-
-}
-
-.maestro-file-btn:hover{
-
-    color:var(--primario);
-
-    background:transparent;
-
-    transform:none;
-
-}
-
-.maestro-file-btn span{
-
-    overflow:hidden;
-
-    text-overflow:ellipsis;
-
-    white-space:nowrap;
-
-}
-
-.fila-empresa-clickeable{
-
-    cursor:pointer;
 
 }
 
@@ -1150,9 +1092,8 @@ transition:opacity .2s ease;
 
 }
 
-/* Los cuadros de editar/confirmar pueden abrirse encima de las
-pantallas grandes (Cargar maestro, Empresas) — necesitan quedar
-siempre por delante, sin importar el orden en el HTML */
+/* Los cuadros de editar/confirmar necesitan quedar siempre por
+delante de cualquier otro elemento superpuesto */
 #modalEditar,
 #modalConfirmar{
 
@@ -1372,182 +1313,3 @@ animation:mensajeSalir .22s ease-in forwards;
 
 }
 
-/* ===========================
-PANTALLAS: CARGAR MAESTRO / EMPRESAS
-=========================== */
-
-.pantalla-grande{
-
-max-width:420px;
-
-text-align:left;
-
-}
-
-.campo-label{
-
-display:block;
-
-font-size:12px;
-
-color:var(--texto-sec);
-
-margin-bottom:6px;
-
-margin-top:4px;
-
-}
-
-.pantalla-grande select{
-
-margin-bottom:14px;
-
-}
-
-.campo-archivo{
-
-border:1px solid var(--borde);
-
-background:var(--fondo);
-
-border-radius:var(--radio-sm);
-
-padding:12px;
-
-justify-content:center;
-
-margin-bottom:10px;
-
-}
-
-.texto-ayuda{
-
-font-size:12.5px;
-
-color:var(--texto-sec);
-
-margin-bottom:14px;
-
-min-height:16px;
-
-}
-
-.lista-empresas{
-
-max-height:260px;
-
-overflow-y:auto;
-
-margin-bottom:14px;
-
-background:var(--fondo);
-
-border-radius:10px;
-
-padding:8px;
-
-}
-
-.fila-empresa{
-
-display:flex;
-
-align-items:center;
-
-justify-content:space-between;
-
-gap:8px;
-
-padding:12px 14px;
-
-margin-bottom:8px;
-
-background:var(--panel);
-
-border-radius:10px;
-
-box-shadow:var(--sombra);
-
-transition:background .15s;
-
-}
-
-.fila-empresa:hover{
-
-background:rgba(21,101,192,.06);
-
-}
-
-.fila-empresa:last-child{
-
-margin-bottom:0;
-
-}
-
-.fila-empresa-nombre{
-
-font-size:14px;
-
-overflow:hidden;
-
-text-overflow:ellipsis;
-
-white-space:nowrap;
-
-}
-
-.fila-empresa-nombre.activa{
-
-color:var(--primario);
-
-font-weight:600;
-
-}
-
-.fila-empresa-acciones{
-
-display:flex;
-
-gap:2px;
-
-flex-shrink:0;
-
-align-items:center;
-
-}
-
-.lista-empresas-vacio{
-
-color:var(--texto-sec);
-
-font-size:13px;
-
-padding:14px 4px;
-
-text-align:center;
-
-}
-
-.agregar-empresa-fila{
-
-display:flex;
-
-gap:8px;
-
-margin-bottom:16px;
-
-}
-
-.agregar-empresa-fila input{
-
-flex:1;
-
-}
-
-.agregar-empresa-fila button{
-
-width:44px;
-
-flex-shrink:0;
-
-}
