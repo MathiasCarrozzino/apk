@@ -50,34 +50,129 @@ function cargarInventarioLocal() {
 }
 
 // ==========================================
-// MAESTRO
+// MAESTRO (guardado en IndexedDB — mucha más
+// capacidad que localStorage para listas grandes)
 // ==========================================
 
-function guardarMaestro() {
+const DB_NOMBRE = "ControlIngresoDB";
+const DB_VERSION = 1;
+const DB_ALMACEN = "maestro";
 
-    localStorage.setItem(
+function abrirBaseDeDatos() {
 
-        STORAGE.MAESTRO,
+    return new Promise((resolve, reject) => {
 
-        JSON.stringify(maestro)
+        const solicitud =
+            indexedDB.open(DB_NOMBRE, DB_VERSION);
 
-    );
+        solicitud.onupgradeneeded = (evento) => {
+
+            const db = evento.target.result;
+
+            if (!db.objectStoreNames.contains(DB_ALMACEN)) {
+                db.createObjectStore(DB_ALMACEN);
+            }
+
+        };
+
+        solicitud.onsuccess = (evento) =>
+            resolve(evento.target.result);
+
+        solicitud.onerror = (evento) =>
+            reject(evento.target.error);
+
+    });
 
 }
 
-function cargarMaestroLocal() {
+async function guardarMaestro() {
 
-    const datos = localStorage.getItem(
+    try {
 
-        STORAGE.MAESTRO
+        const db = await abrirBaseDeDatos();
 
-    );
+        await new Promise((resolve, reject) => {
 
-    maestro = datos
+            const tx = db.transaction(DB_ALMACEN, "readwrite");
 
-        ? JSON.parse(datos)
+            tx.objectStore(DB_ALMACEN).put(maestro, "maestro");
 
-        : [];
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+
+        });
+
+        db.close();
+
+        return true;
+
+    } catch (error) {
+
+        console.error("No se pudo guardar el maestro:", error);
+
+        return false;
+
+    }
+
+}
+
+async function cargarMaestroLocal() {
+
+    try {
+
+        const db = await abrirBaseDeDatos();
+
+        const datos = await new Promise((resolve, reject) => {
+
+            const tx = db.transaction(DB_ALMACEN, "readonly");
+
+            const solicitud =
+                tx.objectStore(DB_ALMACEN).get("maestro");
+
+            solicitud.onsuccess = () => resolve(solicitud.result);
+            solicitud.onerror = () => reject(solicitud.error);
+
+        });
+
+        db.close();
+
+        maestro = Array.isArray(datos) ? datos : [];
+
+    } catch (error) {
+
+        console.error("No se pudo leer el maestro guardado:", error);
+
+        maestro = [];
+
+    }
+
+    // Migración: si venías del sistema anterior (localStorage), se
+    // pasa una sola vez a IndexedDB y se limpia la clave vieja
+    if (maestro.length === 0) {
+
+        const datosViejos = localStorage.getItem(STORAGE.MAESTRO);
+
+        if (datosViejos) {
+
+            try {
+
+                const listaVieja = JSON.parse(datosViejos);
+
+                if (Array.isArray(listaVieja) && listaVieja.length > 0) {
+
+                    maestro = listaVieja;
+
+                    await guardarMaestro();
+
+                    localStorage.removeItem(STORAGE.MAESTRO);
+
+                }
+
+            } catch (error) {}
+
+        }
+
+    }
 
     if (maestro.length > 0) {
 
@@ -236,11 +331,11 @@ function limpiarInventario() {
 
 }
 
-function limpiarMaestro() {
+async function limpiarMaestro() {
 
     maestro = [];
 
-    guardarMaestro();
+    await guardarMaestro();
 
 }
 

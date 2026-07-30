@@ -155,7 +155,7 @@ function cargarMaestroExcel(evento) {
         new FileReader();
 
 
-    lector.onload = function(e) {
+    lector.onload = async function(e) {
 
         try {
 
@@ -216,15 +216,17 @@ function cargarMaestroExcel(evento) {
 
             maestro = listaMaestro;
 
-            guardarMaestro();
+            const guardadoOk = await guardarMaestro();
 
 
             estado.textContent =
                 `Maestro cargado (${maestro.length} artículos)`;
 
             mostrarMensaje(
-                "Maestro cargado correctamente",
-                "exito"
+                guardadoOk
+                    ? "Maestro cargado correctamente"
+                    : "Maestro cargado, pero no se pudo guardar en el dispositivo",
+                guardadoOk ? "exito" : "error"
             );
 
 
