@@ -155,7 +155,7 @@ function cargarMaestroExcel(evento) {
         new FileReader();
 
 
-    lector.onload = async function(e) {
+    lector.onload = function(e) {
 
         try {
 
@@ -216,17 +216,15 @@ function cargarMaestroExcel(evento) {
 
             maestro = listaMaestro;
 
-            const guardadoOk = await guardarMaestro();
+            guardarMaestro();
 
 
             estado.textContent =
                 `Maestro cargado (${maestro.length} artículos)`;
 
             mostrarMensaje(
-                guardadoOk
-                    ? "Maestro cargado correctamente"
-                    : "Maestro cargado, pero no se pudo guardar en el dispositivo",
-                guardadoOk ? "exito" : "error"
+                "Maestro cargado correctamente",
+                "exito"
             );
 
 
@@ -500,6 +498,31 @@ async function agregarArticulo() {
 
 
 
+    if (cantidad > 999) {
+
+
+        const confirmado =
+            await pedirConfirmacion(
+                "Confirmar cantidad",
+                `Estás por ingresar ${cantidad} unidades. ¿Es correcto?`,
+                "Sí, es correcto"
+            );
+
+
+        if (!confirmado) {
+
+            inputCantidad.focus();
+
+            inputCantidad.select();
+
+            return;
+
+        }
+
+    }
+
+
+
     const productoMaestro =
         buscarEnMaestro(
             codigo
@@ -719,46 +742,6 @@ function eventoCodigo(e) {
 
 
 function eventoCantidad(e) {
-
-
-    const esEnter =
-        e.key === "Enter" ||
-        e.keyCode === 13 ||
-        e.which === 13;
-
-
-    if (esEnter) {
-
-
-        e.preventDefault();
-
-
-
-        agregarArticulo();
-
-
-
-        setTimeout(
-            () => {
-
-
-                document
-                .getElementById(
-                    "codigo"
-                )
-                .focus();
-
-
-            },
-            100
-        );
-
-
-    }
-
-}
-
-function eventoObservacion(e) {
 
 
     const esEnter =
