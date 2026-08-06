@@ -25,7 +25,9 @@ function dibujarTabla(listaMostrar = lista) {
 
     tbody.innerHTML = "";
 
-    listaMostrar.forEach((articulo, indice) => {
+    listaMostrar.forEach((articulo) => {
+
+        const indice = lista.indexOf(articulo);
 
         const fila = document.createElement("tr");
 
@@ -108,7 +110,9 @@ function dibujarTarjetas(listaMostrar = lista) {
 
     contenedor.innerHTML = "";
 
-    listaMostrar.forEach((articulo, indice) => {
+    listaMostrar.forEach((articulo) => {
+
+        const indice = lista.indexOf(articulo);
 
         const card = document.createElement("div");
 

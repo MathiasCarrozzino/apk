@@ -198,6 +198,13 @@ function registrarEventos() {
     );
 
 
+    agregarEvento(
+        "campoCaja",
+        "keydown",
+        eventoCaja
+    );
+
+
     // MODAL DE EDICIÓN
 
     agregarEvento(

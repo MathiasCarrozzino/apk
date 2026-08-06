@@ -803,6 +803,33 @@ async function eventoObservacion(e) {
 
 }
 
+function eventoCaja(e) {
+
+
+    const esEnter =
+        e.key === "Enter" ||
+        e.keyCode === 13 ||
+        e.which === 13;
+
+
+    if (esEnter) {
+
+
+        e.preventDefault();
+
+
+
+        document
+        .getElementById(
+            "codigo"
+        )
+        .focus();
+
+
+    }
+
+}
+
 
 
 // ==========================================
