@@ -741,7 +741,7 @@ function eventoCodigo(e) {
 
 
 
-function eventoCantidad(e) {
+async function eventoCantidad(e) {
 
 
     const esEnter =
@@ -757,24 +757,46 @@ function eventoCantidad(e) {
 
 
 
-        agregarArticulo();
+        await agregarArticulo();
 
 
 
-        setTimeout(
-            () => {
+        document
+        .getElementById(
+            "codigo"
+        )
+        .focus();
 
 
-                document
-                .getElementById(
-                    "codigo"
-                )
-                .focus();
+    }
+
+}
+
+async function eventoObservacion(e) {
 
 
-            },
-            100
-        );
+    const esEnter =
+        e.key === "Enter" ||
+        e.keyCode === 13 ||
+        e.which === 13;
+
+
+    if (esEnter) {
+
+
+        e.preventDefault();
+
+
+
+        await agregarArticulo();
+
+
+
+        document
+        .getElementById(
+            "codigo"
+        )
+        .focus();
 
 
     }

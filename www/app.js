@@ -32,7 +32,7 @@ async function iniciarAplicacion() {
     // Cargar datos guardados
 
     if (typeof cargarMaestroLocal === "function")
-        await cargarMaestroLocal();
+        cargarMaestroLocal();
 
 
     if (typeof cargarInventarioLocal === "function")
